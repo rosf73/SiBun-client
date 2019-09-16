@@ -1,2 +1,2 @@
-# Trade-client
-빅데이터를 이용한 여행비서 서비스 Trade의 Client
+# SiBun-client
+금오공대생의 배달 Sharing 서비스인 시켜드실분의 Client
