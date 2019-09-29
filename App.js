@@ -9,6 +9,7 @@ import { ApolloProvider } from 'react-apollo-hooks';
 
 import apolloClientOptions from './apollo';
 import NavController from './components/NavController';
+import { AuthProvider } from './AuthController';
 
 const App = () => {
   const [ loaded, setLoaded ] = useState(false);
@@ -38,8 +39,8 @@ const App = () => {
         ...apolloClientOptions
       });
 
-      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-      if(isLoggedIn === null || isLoggedIn === "false") {
+      const isLoggedIn = AsyncStorage.getItem("isLoggedIn");
+      if (!isLoggedIn || isLoggedIn === "false") {
         setIsLoggedIn(false);
       }
       else {
@@ -57,27 +58,11 @@ const App = () => {
     preLoad();
   }, []);
 
-  const logUserIn = async () => {
-    try {
-      await AsyncStorage.setItem("isLoggedIn", "true");
-      setIsLoggedIn(true);
-    } catch(e) {
-      console.log(e);
-    }
-  }
-
-  const logUserOut = async () => {
-    try {
-      await AsyncStorage.setItem("isLoggedIn", "false");
-      setIsLoggedIn(false);
-    } catch(e) {
-      console.log(e);
-    }
-  }
-
-  return loaded && client && isLoggedIn !== null ?
+  return loaded && client ?
     <ApolloProvider client={client}>
-      <NavController/>
+      <AuthProvider isLoggedIn={isLoggedIn}>
+        <NavController/>
+      </AuthProvider>
     </ApolloProvider>
     :
     <View style={styles.container}>
