@@ -15,6 +15,7 @@ const App = () => {
   const [ loaded, setLoaded ] = useState(false);
   const [ client, setClient ] = useState(null);
   const [ isLoggedIn, setIsLoggedIn ] = useState(null);
+  
   const preLoad = async () => {
     try {
       const remoteImages = [];
@@ -39,13 +40,18 @@ const App = () => {
         ...apolloClientOptions
       });
 
-      const isLoggedIn = AsyncStorage.getItem("isLoggedIn");
-      if (!isLoggedIn || isLoggedIn === "false") {
-        setIsLoggedIn(false);
-      }
-      else {
+      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+      if (isLoggedIn === "true") {
         setIsLoggedIn(true);
       }
+      else {
+        setIsLoggedIn(false);
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(
+          () => { resolve('result') }, 1000
+        ));
 
       setLoaded(true);
       setClient(client);
@@ -54,11 +60,11 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { // 초기 실행
     preLoad();
   }, []);
 
-  return loaded && client ?
+  return loaded && client && isLoggedIn !== null ?
     <ApolloProvider client={client}>
       <AuthProvider isLoggedIn={isLoggedIn}>
         <NavController/>

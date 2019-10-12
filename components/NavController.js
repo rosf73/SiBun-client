@@ -1,20 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useIsLoggedIn } from '../AuthController';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { useIsLoggedIn, useLogIn, useLogOut } from '../AuthController';
+import LoginScreen from '../screens/LoginScreen';
 
 export default () => {
   const isLoggedIn = useIsLoggedIn();
+  const logIn = useLogIn();
+  const logOut = useLogOut();
 
-  return <View style={styles.container}>
-    <Text>Here is NavController</Text>
-  </View>
+  return isLoggedIn ?
+      <TouchableOpacity onPress={logOut}>
+        <Text>로그아웃</Text>
+      </TouchableOpacity>
+      :
+      <LoginScreen func={logIn}/>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF'
-  }
-});
