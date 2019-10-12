@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 
+import CustomIndicator from '../components/CustomIndicator';
+
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
@@ -11,22 +13,32 @@ class LoginScreen extends Component {
     };
   }
 
+  onPressLoginButton = () => {
+    this.setState({ isLoaded: true });
+
+    this.props.func();
+    
+    this.setState({ isLoaded: false });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-      <Image style={styles.logo} source={require("../resources/images/logo.png")}/>
+        <CustomIndicator isLoading={this.state.isLoaded}/>
+
+        <Image style={styles.logo} source={require("../resources/images/logo.png")}/>
 
         <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
 
         <TextInput
           style={styles.textInput}
-          onChangeText={()=>{}}
+          onChangeText={(number)=>{this.setState({number})}}
           value={this.state.number}
           placeholder="학번"
           placeholderTextColor="#FFFFFF"/>
         <TextInput
           style={styles.textInput}
-          onChangeText={()=>{}}
+          onChangeText={(password)=>{this.setState({password})}}
           value={this.state.password}
           secureTextEntry={true}
           placeholder="비밀번호"
@@ -34,7 +46,7 @@ class LoginScreen extends Component {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={this.props.func}>
+          onPress={this.onPressLoginButton}>
           <Text style={styles.buttonText}>로그인</Text>
         </TouchableOpacity>
       </View>
