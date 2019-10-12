@@ -7,9 +7,9 @@ import { persistCache } from 'apollo-cache-persist';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo-hooks';
 
-import apolloClientOptions from './apollo';
-import NavController from './components/NavController';
-import { AuthProvider } from './AuthController';
+import apolloClientOptions from './sources/apollo';
+import NavController from './sources/components/NavController';
+import { AuthProvider } from './sources/AuthController';
 
 const App = () => {
   const [ loaded, setLoaded ] = useState(false);
