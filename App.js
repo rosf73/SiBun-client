@@ -8,7 +8,7 @@ import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo-hooks';
 
 import apolloClientOptions from './sources/apollo';
-import NavController from './sources/components/NavController';
+import NavController from './sources/NavController';
 import { AuthProvider } from './sources/AuthController';
 
 const App = () => {
