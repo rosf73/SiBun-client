@@ -20,8 +20,16 @@ const App = () => {
     try {
       const remoteImages = [];
       const localImages = [
-        require("./resources/images/test.png"),
-        require("./resources/images/test2.png")
+        require("./resources/images/logo.png"),
+        require("./resources/images/back.png"),
+        require("./resources/images/basket.png"),
+        require("./resources/images/change.png"),
+        require("./resources/images/check.png"),
+        require("./resources/images/location.png"),
+        require("./resources/images/me.png"),
+        require("./resources/images/remove.png"),
+        require("./resources/images/star.png"),
+        require("./resources/images/yellowStar.png")
       ];
       await FastImage.preload(remoteImages.map(image => ({
         uri: image
