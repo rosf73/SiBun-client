@@ -26,7 +26,7 @@ class LoginScreen extends Component {
       <View style={styles.container}>
         <CustomIndicator isLoading={this.state.isLoaded}/>
 
-        <Image style={styles.logo} source={require("../resources/images/logo.png")}/>
+        <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
 
         <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
 
