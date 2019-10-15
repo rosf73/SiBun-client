@@ -25,6 +25,8 @@ const MainNavigation = createStackNavigator({
   MakeRoomNavigation,
   ParticipationNavigation,
   OrderNavigation
+}, {
+  headerMode: 'none'
 });
 
 export default createAppContainer(MainNavigation);

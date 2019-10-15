@@ -85,8 +85,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E2937B'
   },
   logo: {
-    height: '18%',
-    resizeMode: 'contain'
+    height: '13%',
+    resizeMode: 'contain',
+    marginBottom: 25
   },
   loading: {
     fontSize: 15,
