@@ -1,22 +1,12 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 
-class MenuScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoaded: false
-    };
-  }
-
-  renderMenuList = () => {
-    
-  }
-
+class Menu extends Component {
   render() {
     return (
-      <View>
-
+      <View style={styles.container}>
+        <View style={styles.left}></View>
+        <View style={styles.right}></View>
       </View>
     );
   }
@@ -24,11 +14,18 @@ class MenuScreen extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: 110,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFF'
+  },
+  left: {
+
+  },
+  right: {
+
   }
 });
 
-export default MenuScreen;
+export default Menu;

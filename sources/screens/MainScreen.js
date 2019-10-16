@@ -70,8 +70,8 @@ class MainScreen extends Component {
           region={{
             latitude: this.state.latitude,
             longitude: this.state.longitude,
-            latitudeDelta: 0.015,
-            longitudeDelta: 0.0121,
+            latitudeDelta: 0.005, // 낮을 수록 줌이 크게 됨.
+            longitudeDelta: 0.005,
           }}>
         </MapView>
       </View>
