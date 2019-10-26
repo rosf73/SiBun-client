@@ -1,10 +1,22 @@
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { Component, Suspense } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native';
+import { useQuery } from 'react-apollo-hooks';
+import gql from 'graphql-tag';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 import Order from '../components/Order';
 import Chat from '../components/Chat';
+import withSuspense from '../withSuspense';
+
+const CHAT = gql`
+  query messages {
+    contentList {
+      id
+      content
+    }
+  }
+`;
 
 class ChatRoomScreen extends Component {
   handlePressExit = () => {
@@ -22,9 +34,14 @@ class ChatRoomScreen extends Component {
   }
 
   render() {
+    const { data, error } = useQuery(CHAT, { suspend: true });
     const orderList = this.renderOrderList();
 
     return (
+      <Suspense fallback={
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator/></View>
+      }>
+
       <View style={styles.container}>
         
         <View style={styles.header}>
@@ -50,19 +67,26 @@ class ChatRoomScreen extends Component {
               <FontAwesome name="angle-double-up" size={30} color="#AAA"/>
             </TouchableOpacity>
           </View>
-          <FlatList
-            ref={(ref) => { this.flatListRef = ref; }}
-            data={orderList}
-            renderItem={({ item }) =>
-              <Order/>
-            }/>
+          <ScrollView contentContainerStyle={styles.orderList}>
+            {orderList.map(order => (
+              <Order key={order.id} user={order.user} menus={order.menuList}/>
+            ))}
+          </ScrollView>
         </View>
 
-        <View style={styles.chat}>
+        <ScrollView contentContainerStyle={styles.chat}>
+          {data.contentList.map(chat => (
+            <Chat key={chat.id} content={chat.content}/>
+          ))}
+        </ScrollView>
+
+        <View style={styles.input}>
 
         </View>
 
       </View>
+
+      </Suspense>
     );
   }
 }
@@ -79,7 +103,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderBottomColor: '#CCC'
   },
@@ -117,8 +140,16 @@ const styles = StyleSheet.create({
     marginLeft: 15
   },
   chat: {
-    flex: 1
+    flex: 1,
+    justifyContent: 'flex-end'
+  },
+  input: {
+    height: 55,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#CCC'
   }
 });
 
-export default ChatRoomScreen;
+export default withSuspense(ChatRoomScreen);

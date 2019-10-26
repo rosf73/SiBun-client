@@ -7,7 +7,7 @@ import { persistCache } from 'apollo-cache-persist';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo-hooks';
 
-import apolloClientOptions from './sources/apollo';
+import apolloClient from './sources/apollo';
 import NavController from './sources/NavController';
 import { AuthProvider } from './sources/AuthController';
 
@@ -43,10 +43,7 @@ const App = () => {
         cache,
         storage: AsyncStorage,
       });
-      const client = new ApolloClient({
-        cache,
-        ...apolloClientOptions
-      });
+      const client = apolloClient;
 
       const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
       if (isLoggedIn === "true") {
