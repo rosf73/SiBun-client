@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid, Image } from 'react-native';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image, Alert } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 
@@ -15,14 +15,14 @@ class MainScreen extends Component {
       isLoaded: false,
       markers: [
         {
+          id: '',
           coordinate: {
-            latitude: this.state.latitude,
-            longitude: this.state.longitude
+            latitude: 36.1465,
+            longitude: 128.39
           },
-          uri: '',
-          name: '',
-          time: '',
-          member: 0
+          uri: 'https://www.bhc.co.kr/images/common/logo300.jpg',
+          time: 13,
+          member: 1
         }
       ]
     };
@@ -67,6 +67,10 @@ class MainScreen extends Component {
     }
   }
 
+  handlePressMarker = () => {
+    this.props.navigation.navigate("ChatRoom");
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -95,10 +99,10 @@ class MainScreen extends Component {
             <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
           </Marker>
           {this.state.markers.map((marker) => {
-            const { uri, name, time, member } = marker;
+            const { id, uri, time, member } = marker;
             return (
-              <Marker {...marker}>
-                <CustomMarker url={uri} name={name} time={time} member={member}/>
+              <Marker {...marker} onPress={this.handlePressMarker}>
+                <CustomMarker uri={uri} time={time} member={member}/>
               </Marker>
             );
           })}
@@ -116,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF'
   },
   header: {
-    height: 55,
+    height: 100,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -125,7 +129,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#CCC'
   },
   map: {
-    flex: 1
+    height: '100%',
+    width: '100%'
   },
   me: {
     height: 80,

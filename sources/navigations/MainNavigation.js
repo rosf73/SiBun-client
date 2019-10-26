@@ -5,6 +5,7 @@ import MainScreen from '../screens/MainScreen';
 import SearchScreen from '../screens/SearchScreen';
 import MyProfileScreen from '../screens/MyProfileScreen';
 import OpenChatInfoScreen from '../screens/OpenChatInfoScreen';
+import ChatRoomScreen from '../screens/ChatRoomScreen';
 import MakeRoomNavigation from './MakeRoomNavigation';
 import ParticipationNavigation from './ParticipationNavigation';
 import OrderNavigation from './OrderNavigation';
@@ -21,6 +22,9 @@ const MainNavigation = createStackNavigator({
   },
   OpenChatInfo: {
     screen: OpenChatInfoScreen
+  },
+  ChatRoom: {
+    screen: ChatRoomScreen
   },
   MakeRoomNavigation,
   ParticipationNavigation,
