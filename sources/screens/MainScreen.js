@@ -74,6 +74,7 @@ class MainScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
+
         <View style={styles.header}>
           <TextInput
             style={styles.textInput}
@@ -82,6 +83,7 @@ class MainScreen extends Component {
             placeholder=""
             placeholderTextColor="#FFFFFF"/>
         </View>
+
         <MapView
           provider={PROVIDER_GOOGLE} // remove if not using Google Maps
           style={styles.map}
@@ -91,6 +93,7 @@ class MainScreen extends Component {
             latitudeDelta: 0.005, // 낮을 수록 줌이 크게 됨.
             longitudeDelta: 0.005,
           }}>
+
           <Marker
             coordinate={{
               latitude: this.state.latitude,
@@ -99,14 +102,16 @@ class MainScreen extends Component {
             <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
           </Marker>
           {this.state.markers.map((marker) => {
-            const { id, uri, time, member } = marker;
+            const { uri, time, member } = marker;
             return (
               <Marker {...marker} onPress={this.handlePressMarker}>
                 <CustomMarker uri={uri} time={time} member={member}/>
               </Marker>
             );
           })}
+
         </MapView>
+
       </View>
     );
   }
@@ -120,13 +125,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF'
   },
   header: {
-    height: 100,
+    height: 55,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#CCC'
+    borderBottomColor: '#CCC',
+    marginTop: 55
   },
   map: {
     height: '100%',
