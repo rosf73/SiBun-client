@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid } from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
+
+import CustomMarker from '../components/CustomMarker';
 
 class MainScreen extends Component {
   constructor(props) {
@@ -10,7 +12,19 @@ class MainScreen extends Component {
       latitude: 0,
       longitude: 0,
       hasLocationPermission: false,
-      isLoaded: false
+      isLoaded: false,
+      markers: [
+        {
+          coordinate: {
+            latitude: this.state.latitude,
+            longitude: this.state.longitude
+          },
+          uri: '',
+          name: '',
+          time: '',
+          member: 0
+        }
+      ]
     };
   }
 
@@ -73,6 +87,21 @@ class MainScreen extends Component {
             latitudeDelta: 0.005, // 낮을 수록 줌이 크게 됨.
             longitudeDelta: 0.005,
           }}>
+          <Marker
+            coordinate={{
+              latitude: this.state.latitude,
+              longitude: this.state.longitude
+            }}>
+            <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
+          </Marker>
+          {this.state.markers.map((marker) => {
+            const { uri, name, time, member } = marker;
+            return (
+              <Marker {...marker}>
+                <CustomMarker url={uri} name={name} time={time} member={member}/>
+              </Marker>
+            );
+          })}
         </MapView>
       </View>
     );
@@ -97,6 +126,10 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1
+  },
+  me: {
+    height: 80,
+    resizeMode: 'contain'
   }
 });
 
