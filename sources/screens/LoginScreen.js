@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { useMutation } from 'react-apollo-hooks';
 
 import CustomIndicator from '../components/CustomIndicator';
@@ -14,23 +14,31 @@ class LoginScreen extends Component {
     };
   }
 
-  onPressLoginButton = () => {
-    this.setState({ isLoaded: true });
+  numberInput = useInput("");
+  pwdInput = useInput("");
+  signIn = useMutation(SIGN_IN, {
+    variables: {
+      number: numberInput.value,
+      pwd: pwdInput.value
+    }
+  });
 
-    this.props.func();
-    
-    this.setState({ isLoaded: false });
+  onPressLoginButton = async () => {
+    try {
+      this.setState({ isLoaded: true });
+      await this.signIn();
+      this.props.navigation.navigate("Main");
+    }
+    catch(e) {
+      Alert.alert("로그인에 실패하였습니다");
+    }
+    finally {
+      this.props.func();
+      this.setState({ isLoaded: false });
+    }
   }
 
   render() {
-    const numberInput = useInput("");
-    const pwdInput = useInput("");
-    const signIn = useMutation(SIGN_IN, {
-      variables: {
-        number: numberInput
-      }
-    });
-
     return (
       <View style={styles.container}>
         <CustomIndicator isLoading={this.state.isLoaded}/>
@@ -40,12 +48,12 @@ class LoginScreen extends Component {
         <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
 
         <TextInput
-          {...numberInput}
+          {...this.numberInput}
           style={styles.textInput}
           placeholder="학번"
           placeholderTextColor="#FFFFFF"/>
         <TextInput
-          {...pwdInput}
+          {...this.pwdInput}
           style={styles.textInput}
           secureTextEntry={true}
           placeholder="비밀번호"

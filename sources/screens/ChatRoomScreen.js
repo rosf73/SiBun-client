@@ -34,14 +34,11 @@ class ChatRoomScreen extends Component {
   }
 
   render() {
-    const { data, error } = useQuery(CHAT, { suspend: true });
-    const orderList = this.renderOrderList();
+    const contentList = [];
+    //const { data, error } = useQuery(CHAT, { suspend: true });
+    const orderList = [];//this.renderOrderList();
 
     return (
-      <Suspense fallback={
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator/></View>
-      }>
-
       <View style={styles.container}>
         
         <View style={styles.header}>
@@ -75,7 +72,7 @@ class ChatRoomScreen extends Component {
         </View>
 
         <ScrollView contentContainerStyle={styles.chat}>
-          {data.contentList.map(chat => (
+          {contentList.map(chat => (
             <Chat key={chat.id} content={chat.content}/>
           ))}
         </ScrollView>
@@ -85,8 +82,6 @@ class ChatRoomScreen extends Component {
         </View>
 
       </View>
-
-      </Suspense>
     );
   }
 }
