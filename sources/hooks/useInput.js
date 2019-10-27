@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const useInput = (initialValue) => {
+export const useInput = (initialValue) => {
   const [ value, setValue ] = useState(initialValue);
   const onChangeText = (text) => {
     setValue(text);
@@ -15,6 +15,4 @@ export const useNumInput = (initialValue) => {
     setValue(text);
   }
   return { value, onChangeText };
-};
-
-export default useInput;
+}

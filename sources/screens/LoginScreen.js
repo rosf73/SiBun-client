@@ -4,7 +4,7 @@ import { useMutation } from 'react-apollo-hooks';
 
 //import CustomIndicator from '../components/CustomIndicator';
 import { SIGN_IN } from '../queries/UserQuery';
-import useInput, { useNumInput } from '../hooks/useInput';
+import { useInput, useNumInput } from '../hooks/useInput';
 
 export default ({ func }) => {
   const numberInput = useNumInput("");

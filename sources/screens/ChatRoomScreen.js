@@ -1,7 +1,6 @@
 import React, { Component, Suspense } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView, ActivityIndicator, TextInput } from 'react-native';
 import { useQuery } from 'react-apollo-hooks';
-import gql from 'graphql-tag';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
@@ -9,22 +8,8 @@ import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
 import Order from '../components/Order';
 import Chat from '../components/Chat';
 import withSuspense from '../withSuspense';
-import useInput from '../hooks/useInput';
-
-const CHAT = gql`
-  query chatContent {
-    chatContent {
-      id
-      user {
-        id
-      }
-      chatRoom {
-        id
-      }
-      content
-    }
-  }
-`;
+import { CHAT } from '../queries/ChatQuery';
+import { useInput, useNumInput } from '../hooks/useInput';
 
 const ChatRoomScreen = ({ navigation }) => {
   handlePressExit = () => {
@@ -38,10 +23,6 @@ const ChatRoomScreen = ({ navigation }) => {
   }
   handlePressSend = () => {
     alert('send!');
-  }
-
-  renderOrderList = (orderList) => {
-
   }
 
   // const contentList = [
