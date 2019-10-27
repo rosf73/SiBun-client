@@ -1,24 +1,40 @@
 import React, { Component, Suspense } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView, ActivityIndicator, TextInput } from 'react-native';
 import { useQuery } from 'react-apollo-hooks';
 import gql from 'graphql-tag';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
 
 import Order from '../components/Order';
 import Chat from '../components/Chat';
 import withSuspense from '../withSuspense';
+import useInput from '../hooks/useInput';
 
 const CHAT = gql`
-  query messages {
+  query chatContent {
     contentList {
       id
+      user {
+        id
+      }
+      chatRoom {
+        id
+      }
       content
     }
   }
 `;
 
 class ChatRoomScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      chat: "",
+      isLoaded: false
+    };
+  }
+
   handlePressExit = () => {
     this.props.navigation.navigate("Main");
   }
@@ -28,13 +44,19 @@ class ChatRoomScreen extends Component {
   handlePressFolder = () => {
     alert('folder!');
   }
+  handlePressSend = () => {
+    alert('send!');
+  }
 
   renderOrderList(orderList) {
 
   }
 
   render() {
-    const contentList = [];
+    const contentList = [
+      { id: "1", user: { id: "밥풀이1" }, chatRoom: { id: "1" }, content: "안녕하세요" },
+      { id: "2", user: { id: "밥풀이2" }, chatRoom: { id: "1" }, content: "배고파요 ㅠㅠ" },
+    ];
     //const { data, error } = useQuery(CHAT, { suspend: true });
     const orderList = [];//this.renderOrderList();
 
@@ -45,7 +67,7 @@ class ChatRoomScreen extends Component {
           <TouchableOpacity
             style={styles.exit}
             onPress={this.handlePressExit}>
-              <Text style={styles.exitText}>나가기</Text>
+              <Text style={styles.buttonText}>나가기</Text>
           </TouchableOpacity>
           <Text style={styles.store}>BHC 옥계행복점</Text>
           <TouchableOpacity
@@ -69,16 +91,34 @@ class ChatRoomScreen extends Component {
               <Order key={order.id} user={order.user} menus={order.menuList}/>
             ))}
           </ScrollView>
+          <View style={styles.orderPrice}>
+            <Text>총 주문액</Text>
+          </View>
+          <View style={styles.orderFooter}>
+            <TouchableOpacity
+              style={styles.ordering}
+              onPress={this.handlePressFolder}>
+              <Text style={styles.buttonText}>주문하기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView contentContainerStyle={styles.chat}>
           {contentList.map(chat => (
-            <Chat key={chat.id} content={chat.content}/>
+            <Chat key={chat.id} user={chat.user.id} chatRoom={chat.chatRoom.id} content={chat.content}/>
           ))}
         </ScrollView>
 
         <View style={styles.input}>
-
+          <TextInput
+            value={this.state.chat}
+            onChangeText={(chat) => {this.setState({ chat })}}
+            style={styles.textInput}/>
+          <TouchableOpacity
+            style={{ marginHorizontal: 10 }}
+            onPress={this.handlePressEdit}>
+            <SimpleLineIcon name="paper-plane" size={30} color="#666"/>
+          </TouchableOpacity>
         </View>
 
       </View>
@@ -107,7 +147,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 5
   },
-  exitText: {
+  buttonText: {
     fontSize: 16,
     color: '#FFF'
   },
@@ -115,13 +155,13 @@ const styles = StyleSheet.create({
     color: '#666'
   },
   order: {
-    height: 200,
+    height: 250,
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderBottomColor: '#CCC'
   },
   orderList: {
-
+    flex: 1
   },
   orderHeader: {
     height: 40,
@@ -134,6 +174,21 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 15
   },
+  orderPrice: {
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
+  orderFooter: {
+    height: 55,
+    alignItems: 'flex-end'
+  },
+  ordering: {
+    backgroundColor: '#88F',
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 15
+  },
   chat: {
     flex: 1,
     justifyContent: 'flex-end'
@@ -141,9 +196,21 @@ const styles = StyleSheet.create({
   input: {
     height: 55,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#CCC'
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    backgroundColor: '#EEE',
+    marginLeft: 10
   }
 });
 

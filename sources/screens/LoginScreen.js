@@ -10,16 +10,16 @@ class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      number: "",
+      pwd: "",
       isLoaded: false
     };
   }
 
-  numberInput = useInput("");
-  pwdInput = useInput("");
   signIn = useMutation(SIGN_IN, {
     variables: {
-      number: numberInput.value,
-      pwd: pwdInput.value
+      number: this.state.number,
+      pwd: this.state.pwd
     }
   });
 
@@ -48,12 +48,14 @@ class LoginScreen extends Component {
         <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
 
         <TextInput
-          {...this.numberInput}
+          value={this.state.number}
+          onChangeText={(number) => {this.setState({ number })}}
           style={styles.textInput}
           placeholder="학번"
           placeholderTextColor="#FFFFFF"/>
         <TextInput
-          {...this.pwdInput}
+          value={this.state.number}
+          onChangeText={(pwd) => {this.setState({ pwd })}}
           style={styles.textInput}
           secureTextEntry={true}
           placeholder="비밀번호"
