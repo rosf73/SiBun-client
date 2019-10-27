@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
+import { useMutation } from 'react-apollo-hooks';
 
 import CustomIndicator from '../components/CustomIndicator';
+import { SIGN_IN } from '../queries/UserQuery';
+import useInput from '../hooks/useInput';
 
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      number: '',
-      password: '',
       isLoaded: false
     };
   }
@@ -22,6 +23,14 @@ class LoginScreen extends Component {
   }
 
   render() {
+    const numberInput = useInput("");
+    const pwdInput = useInput("");
+    const signIn = useMutation(SIGN_IN, {
+      variables: {
+        number: numberInput
+      }
+    });
+
     return (
       <View style={styles.container}>
         <CustomIndicator isLoading={this.state.isLoaded}/>
@@ -31,15 +40,13 @@ class LoginScreen extends Component {
         <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
 
         <TextInput
+          {...numberInput}
           style={styles.textInput}
-          onChangeText={(number)=>{this.setState({number})}}
-          value={this.state.number}
           placeholder="학번"
           placeholderTextColor="#FFFFFF"/>
         <TextInput
+          {...pwdInput}
           style={styles.textInput}
-          onChangeText={(password)=>{this.setState({password})}}
-          value={this.state.password}
           secureTextEntry={true}
           placeholder="비밀번호"
           placeholderTextColor="#FFFFFF"/>
