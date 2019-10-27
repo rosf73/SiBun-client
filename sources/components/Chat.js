@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 100,
     resizeMode: 'contain',
-    marginLeft: 15
+    marginRight: 15
   },
   name: {
     color: '#666'

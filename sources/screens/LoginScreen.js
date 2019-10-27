@@ -2,73 +2,61 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { useMutation } from 'react-apollo-hooks';
 
-import CustomIndicator from '../components/CustomIndicator';
+//import CustomIndicator from '../components/CustomIndicator';
 import { SIGN_IN } from '../queries/UserQuery';
-import useInput from '../hooks/useInput';
+import useInput, { useNumInput } from '../hooks/useInput';
 
-class LoginScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      number: "",
-      pwd: "",
-      isLoaded: false
-    };
-  }
-
-  signIn = useMutation(SIGN_IN, {
+export default ({ func }) => {
+  const numberInput = useNumInput("");
+  const pwdInput = useInput("");
+  const onSignIn = useMutation(SIGN_IN, {
     variables: {
-      number: this.state.number,
-      pwd: this.state.pwd
+      number: numberInput.value,
+      pwd: pwdInput.value
     }
-  });
+  })[0];
 
   onPressLoginButton = async () => {
     try {
-      this.setState({ isLoaded: true });
-      await this.signIn();
-      this.props.navigation.navigate("Main");
+      const { data: { signIn } } = await onSignIn();
+      if(signIn) {
+        func();
+      }
+      else {
+        Alert.alert("존재하지 않는 아이디입니다");
+      }
     }
     catch(e) {
+      console.log(e);
       Alert.alert("로그인에 실패하였습니다");
     }
-    finally {
-      this.props.func();
-      this.setState({ isLoaded: false });
-    }
   }
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <CustomIndicator isLoading={this.state.isLoaded}/>
+  return (
+    <View style={styles.container}>
+      <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
 
-        <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
+      <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
 
-        <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
+      <TextInput
+        {...numberInput}
+        style={styles.textInput}
+        placeholder="학번"
+        placeholderTextColor="#FFFFFF"/>
+      <TextInput
+        {...pwdInput}
+        style={styles.textInput}
+        secureTextEntry={true}
+        placeholder="비밀번호"
+        placeholderTextColor="#FFFFFF"/>
 
-        <TextInput
-          value={this.state.number}
-          onChangeText={(number) => {this.setState({ number })}}
-          style={styles.textInput}
-          placeholder="학번"
-          placeholderTextColor="#FFFFFF"/>
-        <TextInput
-          value={this.state.number}
-          onChangeText={(pwd) => {this.setState({ pwd })}}
-          style={styles.textInput}
-          secureTextEntry={true}
-          placeholder="비밀번호"
-          placeholderTextColor="#FFFFFF"/>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={this.onPressLoginButton}>
-          <Text style={styles.buttonText}>로그인</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+      <TouchableOpacity
+        style={styles.button}
+        onPress={this.onPressLoginButton}>
+        <Text style={styles.buttonText}>로그인</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -110,5 +98,3 @@ const styles = StyleSheet.create({
     color: '#FFFFFF'
   }
 });
-
-export default LoginScreen;

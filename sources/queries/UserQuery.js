@@ -1,7 +1,7 @@
 import { gql } from 'apollo-boost';
 
 export const SIGN_IN = gql`
-  mutation singIn($number: Int! $pwd: String!) {
-    singIn(number: $number pwd: $pwd)
+  mutation signIn($number: Int! $pwd: String!) {
+    signIn(number: $number pwd: $pwd)
   }
 `;

@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import FastImage from 'react-native-fast-image';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { persistCache } from 'apollo-cache-persist';
-import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo-hooks';
 
 import apolloClient from './sources/apollo';
@@ -13,7 +12,6 @@ import { AuthProvider } from './sources/AuthController';
 
 const App = () => {
   const [ loaded, setLoaded ] = useState(false);
-  const [ client, setClient ] = useState(null);
   const [ isLoggedIn, setIsLoggedIn ] = useState(null);
   
   const preLoad = async () => {
@@ -43,7 +41,6 @@ const App = () => {
         cache,
         storage: AsyncStorage,
       });
-      const client = apolloClient;
 
       const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
       if (isLoggedIn === "true") {
@@ -59,7 +56,6 @@ const App = () => {
         ));
 
       setLoaded(true);
-      setClient(client);
     } catch(e) {
       console.log(e);
     }
@@ -69,8 +65,8 @@ const App = () => {
     preLoad();
   }, []);
 
-  return loaded && client && isLoggedIn !== null ?
-    <ApolloProvider client={client}>
+  return loaded && apolloClient && isLoggedIn !== null ?
+    <ApolloProvider client={apolloClient}>
       <AuthProvider isLoggedIn={isLoggedIn}>
         <NavController/>
       </AuthProvider>

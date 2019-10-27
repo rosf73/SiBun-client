@@ -13,7 +13,7 @@ import useInput from '../hooks/useInput';
 
 const CHAT = gql`
   query chatContent {
-    contentList {
+    chatContent {
       id
       user {
         id
@@ -26,17 +26,9 @@ const CHAT = gql`
   }
 `;
 
-class ChatRoomScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      chat: "",
-      isLoaded: false
-    };
-  }
-
+const ChatRoomScreen = ({ navigation }) => {
   handlePressExit = () => {
-    this.props.navigation.navigate("Main");
+    navigation.navigate("Main");
   }
   handlePressEdit = () => {
     alert('edit!');
@@ -48,82 +40,81 @@ class ChatRoomScreen extends Component {
     alert('send!');
   }
 
-  renderOrderList(orderList) {
+  renderOrderList = (orderList) => {
 
   }
 
-  render() {
-    const contentList = [
-      { id: "1", user: { id: "밥풀이1" }, chatRoom: { id: "1" }, content: "안녕하세요" },
-      { id: "2", user: { id: "밥풀이2" }, chatRoom: { id: "1" }, content: "배고파요 ㅠㅠ" },
-    ];
-    //const { data, error } = useQuery(CHAT, { suspend: true });
-    const orderList = [];//this.renderOrderList();
+  // const contentList = [
+  //   { id: "1", user: { id: "밥풀이1" }, chatRoom: { id: "1" }, content: "안녕하세요" },
+  //   { id: "2", user: { id: "밥풀이2" }, chatRoom: { id: "1" }, content: "배고파요 ㅠㅠ" },
+  // ];
+  const chatInput = useInput("");
+  const { data, error } = useQuery(CHAT, { suspend: true });
+  console.log(data);
+  const orderList = [];//this.renderOrderList();
 
-    return (
-      <View style={styles.container}>
-        
-        <View style={styles.header}>
+  return (
+    <View style={styles.container}>
+      
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.exit}
+          onPress={this.handlePressExit}>
+            <Text style={styles.buttonText}>나가기</Text>
+        </TouchableOpacity>
+        <Text style={styles.store}>BHC 옥계행복점</Text>
+        <TouchableOpacity
+          style={{ marginRight: 10 }}
+          onPress={this.handlePressEdit}>
+          <Entypo name="menu" size={30} color="#AAA"/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.order}>
+        <View style={styles.orderHeader}>
+          <Text style={styles.orderTitle}>주문 현황</Text>
           <TouchableOpacity
-            style={styles.exit}
-            onPress={this.handlePressExit}>
-              <Text style={styles.buttonText}>나가기</Text>
-          </TouchableOpacity>
-          <Text style={styles.store}>BHC 옥계행복점</Text>
-          <TouchableOpacity
-            style={{ marginRight: 10 }}
-            onPress={this.handlePressEdit}>
-            <Entypo name="menu" size={30} color="#AAA"/>
+            style={{ marginRight: 20 }}
+            onPress={this.handlePressFolder}>
+            <FontAwesome name="angle-double-up" size={30} color="#AAA"/>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.order}>
-          <View style={styles.orderHeader}>
-            <Text style={styles.orderTitle}>주문 현황</Text>
-            <TouchableOpacity
-              style={{ marginRight: 20 }}
-              onPress={this.handlePressFolder}>
-              <FontAwesome name="angle-double-up" size={30} color="#AAA"/>
-            </TouchableOpacity>
-          </View>
-          <ScrollView contentContainerStyle={styles.orderList}>
-            {orderList.map(order => (
-              <Order key={order.id} user={order.user} menus={order.menuList}/>
-            ))}
-          </ScrollView>
-          <View style={styles.orderPrice}>
-            <Text>총 주문액</Text>
-          </View>
-          <View style={styles.orderFooter}>
-            <TouchableOpacity
-              style={styles.ordering}
-              onPress={this.handlePressFolder}>
-              <Text style={styles.buttonText}>주문하기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <ScrollView contentContainerStyle={styles.chat}>
-          {contentList.map(chat => (
-            <Chat key={chat.id} user={chat.user.id} chatRoom={chat.chatRoom.id} content={chat.content}/>
+        <ScrollView contentContainerStyle={styles.orderList}>
+          {orderList.map(order => (
+            <Order key={order.id} user={order.user} menus={order.menuList}/>
           ))}
         </ScrollView>
-
-        <View style={styles.input}>
-          <TextInput
-            value={this.state.chat}
-            onChangeText={(chat) => {this.setState({ chat })}}
-            style={styles.textInput}/>
+        <View style={styles.orderPrice}>
+          <Text>총 주문액</Text>
+        </View>
+        <View style={styles.orderFooter}>
           <TouchableOpacity
-            style={{ marginHorizontal: 10 }}
-            onPress={this.handlePressEdit}>
-            <SimpleLineIcon name="paper-plane" size={30} color="#666"/>
+            style={styles.ordering}
+            onPress={this.handlePressFolder}>
+            <Text style={styles.buttonText}>주문하기</Text>
           </TouchableOpacity>
         </View>
-
       </View>
-    );
-  }
+
+      <ScrollView contentContainerStyle={styles.chat}>
+        {/* {data.chatContent.map(chat => (
+          <Chat key={chat.id} user={chat.user.id} chatRoom={chat.chatRoom.id} content={chat.content}/>
+        ))} */null}
+      </ScrollView>
+
+      <View style={styles.input}>
+        <TextInput
+          {...chatInput}
+          style={styles.textInput}/>
+        <TouchableOpacity
+          style={{ marginHorizontal: 10 }}
+          onPress={this.handlePressEdit}>
+          <SimpleLineIcon name="paper-plane" size={30} color="#666"/>
+        </TouchableOpacity>
+      </View>
+
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

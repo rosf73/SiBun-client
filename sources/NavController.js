@@ -10,7 +10,7 @@ export default () => {
   const logOut = useLogOut();
 
   return isLoggedIn ?
-      <MainNavigation/>
-      :
-      <LoginScreen func={logIn}/>;
+    <MainNavigation/>
+    :
+    <LoginScreen func={logIn}/>;
 }
