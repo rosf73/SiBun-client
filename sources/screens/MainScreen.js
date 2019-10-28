@@ -1,34 +1,40 @@
-import React, { Component } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid, Image, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, FlatList } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
+import { useMutation, useQuery } from 'react-apollo-hooks';
+import { withNavigation } from 'react-navigation';
+import Ionicon from 'react-native-vector-icons/Ionicons'
 
 import CustomMarker from '../components/CustomMarker';
+import withSuspense from '../withSuspense';
+import { useInput } from '../hooks/useInput';
+import { FIND_MY_CHAT_LIST } from '../queries/UserQuery';
 
-class MainScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      latitude: 0,
-      longitude: 0,
-      hasLocationPermission: false,
-      isLoaded: false,
-      markers: [
-        {
-          id: '',
-          coordinate: {
-            latitude: 36.1465,
-            longitude: 128.39
-          },
-          uri: 'https://www.bhc.co.kr/images/common/logo300.jpg',
-          time: 13,
-          member: 1
-        }
-      ]
-    };
-  }
+function MainScreen(props) {
+  const [ loading, setLoading ] = useState(false);
+  const [ coordinate, setCoordinate ] = useState({ latitude: 0, longitude: 0 });
+  const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
+  const [ markers, setMarkers ] = useState([
+    {
+      id: 'ck2972zkwnvoy0b60s7umzvm1',
+      coordinate: {
+        latitude: 36.1465,
+        longitude: 128.39
+      },
+      uri: 'https://www.bhc.co.kr/images/common/logo300.jpg',
+      time: 13,
+      member: 1
+    }
+  ]);
+  const searchInput = useInput("");
+  //const { data, error } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
 
-  requestLocationPermission = async () => {
+  useEffect(() => {
+    preLoad();
+  }, [hasLocationPermission]);
+
+  async function preLoad() {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -39,82 +45,102 @@ class MainScreen extends Component {
       );
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        this.setState({ hasLocationPermission: true });
+        setHasLocationPermission(true);
       } else {
         console.log("location permission denied");
         alert("Location permission denied");
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.warn(err);
     }
-  }
-
-  async componentDidMount() {
-    await this.requestLocationPermission();
-
-    if (this.state.hasLocationPermission) {
-      Geolocation.getCurrentPosition(
-        (position) => {
-          this.setState({ latitude: position.coords.latitude });
-          this.setState({ longitude: position.coords.longitude });
-        },
-        (error) => {
-          // See error code charts below.
-          console.log(error.code, error.message);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
+    finally {
+      if (hasLocationPermission) {
+        Geolocation.getCurrentPosition(
+          (position) => {
+            setCoordinate({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          },
+          (error) => {
+            console.log(error.code, error.message);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+      }
+  
+      return;
     }
   }
 
-  handlePressMarker = () => {
-    this.props.navigation.navigate("ChatRoom");
+  const handlePressSearch = () => {
+
   }
 
-  render() {
-    return (
-      <View style={styles.container}>
+  return (
+    <View style={styles.container}>
 
-        <View style={styles.header}>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(number)=>{this.setState({number})}}
-            value={this.state.number}
-            placeholder=""
-            placeholderTextColor="#FFFFFF"/>
-        </View>
-
-        <MapView
-          provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-          style={styles.map}
-          region={{
-            latitude: this.state.latitude,
-            longitude: this.state.longitude,
-            latitudeDelta: 0.005, // 낮을 수록 줌이 크게 됨.
-            longitudeDelta: 0.005,
-          }}>
-
-          <Marker
-            coordinate={{
-              latitude: this.state.latitude,
-              longitude: this.state.longitude
-            }}>
-            <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
-          </Marker>
-          {this.state.markers.map((marker) => {
-            const { id, uri, time, member } = marker;
-            return (
-              <Marker {...marker} key={id} onPress={this.handlePressMarker}>
-                <CustomMarker uri={uri} time={time} member={member}/>
-              </Marker>
-            );
-          })}
-
-        </MapView>
-
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={{ marginLeft: 10 }}
+          onPress={handlePressSearch}>
+          <Image style={styles.icon} source={require('../../resources/images/me.png')}/>
+        </TouchableOpacity>
+        <TextInput
+          {...searchInput}
+          style={styles.textInput}
+          placeholder=""
+          placeholderTextColor="#FFFFFF"/>
+        <TouchableOpacity
+          style={{ marginRight: 10 }}
+          onPress={handlePressSearch}>
+          <Ionicon name="md-search" size={30} color="#666"/>
+        </TouchableOpacity>
       </View>
-    );
-  }
+      
+      <View style={styles.rooms}>
+        <FlatList
+          ref={ref => this.flatListRef = ref}
+          data={[]}
+          renderItem={({ item }) =>
+            <Room uri={item.image} location={item.location}/>}
+          keyExtractor={item => item.id}/>
+      </View>
+
+      <MapView
+        provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+        style={styles.map}
+        region={{
+          latitude: coordinate.latitude-0.001,
+          longitude: coordinate.longitude,
+          latitudeDelta: 0.005, // 낮을 수록 줌이 크게 됨.
+          longitudeDelta: 0.005,
+        }}>
+
+        <Marker
+          coordinate={{
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude
+          }}>
+          <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
+        </Marker>
+        {markers.map((marker) => {
+          const { id, uri, time, member } = marker;
+          const onPress = () => {
+            props.navigation.navigate("ChatRoom", { roomId: "ck2972zkwnvoy0b60s7umzvm1" })
+          }
+          return (
+            <Marker {...marker} key={id} onPress={onPress}>
+              <CustomMarker uri={uri} time={time} member={member}/>
+            </Marker>
+          );
+        })}
+
+      </MapView>
+
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -129,10 +155,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderBottomColor: '#CCC',
-    marginTop: 55
+    marginTop: 135
+  },
+  icon: {
+    height: 25,
+    width: 25,
+    resizeMode: 'contain'
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    backgroundColor: '#EEE',
+    marginHorizontal: 10
+  },
+  rooms: {
+    height: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#CCC'
   },
   map: {
     height: '100%',
@@ -144,4 +193,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default MainScreen;
+export default withSuspense(withNavigation(MainScreen));

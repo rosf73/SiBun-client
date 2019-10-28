@@ -49,6 +49,8 @@ const App = () => {
       else {
         setIsLoggedIn(false);
       }
+      // await AsyncStorage.setItem("isLoggedIn", "false");
+      // setIsLoggedIn(false);
 
       await new Promise((resolve) =>
         setTimeout(

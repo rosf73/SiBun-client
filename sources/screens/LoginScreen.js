@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { useMutation } from 'react-apollo-hooks';
+import AsyncStorage from '@react-native-community/async-storage';
 
 //import CustomIndicator from '../components/CustomIndicator';
 import { SIGN_IN } from '../queries/UserQuery';
@@ -23,7 +24,7 @@ export default ({ func }) => {
 
       const { data: { signIn } } = await signInMutation();
       if(signIn) {
-        func();
+        func(signIn);
       }
       else {
         Alert.alert("존재하지 않는 아이디입니다");

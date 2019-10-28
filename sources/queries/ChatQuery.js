@@ -40,3 +40,19 @@ export const SEND_CHAT = gql`
     sendChat(roomId: $roomId, content: $content)
   }
 `;
+
+export const NEW_CHAT = gql`
+  subscription newChat {
+    newChat {
+      id
+      user {
+        id
+        number
+      }
+      chatRoom {
+        id
+      }
+      content
+    }
+  }
+`;

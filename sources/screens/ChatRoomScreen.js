@@ -1,36 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput, FlatList } from 'react-native';
-import { useMutation } from 'react-apollo-hooks';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
+import { useMutation, useSubscription } from 'react-apollo-hooks';
+import { withNavigation } from 'react-navigation';
 
 import Order from '../components/Order';
 import Chat from '../components/Chat';
 import withSuspense from '../withSuspense';
-import { CHAT_CONTENT_LIST, SEND_CHAT } from '../queries/ChatQuery';
+import { CHAT_CONTENT_LIST, SEND_CHAT, NEW_CHAT } from '../queries/ChatQuery';
 import { useInput } from '../hooks/useInput';
 
-function ChatRoomScreen({ navigation }) {
+function ChatRoomScreen(props) {
   const [ loading, setLoading ] = useState(false);
   const [ folding, setFolding ] = useState(false);
   const [ chatContentList, setChatContentList ] = useState([]);
+  const [ content, setContent ] = useState("");
+  const orderList = []
   const chatContentsMutation = useMutation(CHAT_CONTENT_LIST, {
     variables: {
-      roomId: "ck2972zkwnvoy0b60s7umzvm1"
+      roomId: "ck2972zkwnvoy0b60s7umzvm1" //props.roomId
     }
   })[0];
   const sendChatMutation = useMutation(SEND_CHAT, {
     variables: {
-      roomId: "ck2972zkwnvoy0b60s7umzvm1",
-      content: chatInput.value
+      roomId: "ck2972zkwnvoy0b60s7umzvm1", //props.roomId
+      content: content
     }
   })[0];
-
+  const { data: newChat } = useSubscription(NEW_CHAT);
 
   useEffect(() => {
     preLoad();
-  }, [chatContentList]);
+  }, []);
 
   async function preLoad() {
     try { // ComponentWillMount
@@ -38,6 +41,10 @@ function ChatRoomScreen({ navigation }) {
 
       const { data: { chatContents } } = await chatContentsMutation();
       setChatContentList(chatContents);
+
+      if(newChat !== undefined) {
+        console.log(newChat);
+      }
 
       setLoading(false);
     }
@@ -49,12 +56,18 @@ function ChatRoomScreen({ navigation }) {
       return; // ComponentDidMount
     }
   }
-
-  const chatInput = useInput("");
-  const orderList = []
   
   const handlePressExit = () => {
-    navigation.navigate("Main");
+    Alert.alert('', '정말로 이 채팅방을 나가시겠습니까?', [
+      {
+        text: '확인', onPress: () => {
+          props.navigation.navigate("Main");
+        }
+      },
+      {
+        text: '취소', onPress: () => { }
+      }
+    ]);
   }
   const handlePressEdit = () => {
     alert('edit!');
@@ -70,15 +83,14 @@ function ChatRoomScreen({ navigation }) {
       setLoading(true);
 
       await sendChatMutation();
+      setContent("");
+      this.flatListRef.scrollToEnd({ animated: true });
 
       setLoading(false);
     }
     catch(e) {
       console.log(e);
       Alert.alert("hell");
-    }
-    finally {
-      chatInput.value = "";
     }
   }
 
@@ -114,7 +126,7 @@ function ChatRoomScreen({ navigation }) {
           ))}
         </ScrollView>
         <View style={styles.orderPrice}>
-          <Text>총 주문액</Text>
+          <Text style={styles.orderPriceText}>총 주문액</Text>
         </View>
         <View style={styles.orderFooter}>
           <TouchableOpacity
@@ -136,7 +148,8 @@ function ChatRoomScreen({ navigation }) {
 
       <View style={styles.input}>
         <TextInput
-          {...chatInput}
+          value={content}
+          onChangeText={(content) => setContent(content)}
           style={styles.textInput}/>
         <TouchableOpacity
           style={{ marginHorizontal: 10 }}
@@ -202,6 +215,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end'
   },
+  orderPriceText: {
+    marginRight: 20
+  },
   orderFooter: {
     height: 55,
     alignItems: 'flex-end'
@@ -237,4 +253,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default withSuspense(ChatRoomScreen);
+export default withSuspense(withNavigation(ChatRoomScreen));

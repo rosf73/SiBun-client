@@ -11,6 +11,9 @@ import ParticipationNavigation from './ParticipationNavigation';
 import OrderNavigation from './OrderNavigation';
 
 const MainNavigation = createStackNavigator({
+  ChatRoom: {
+    screen: ChatRoomScreen
+  },
   Main: {
     screen: MainScreen
   },
@@ -22,9 +25,6 @@ const MainNavigation = createStackNavigator({
   },
   OpenChatInfo: {
     screen: OpenChatInfoScreen
-  },
-  ChatRoom: {
-    screen: ChatRoomScreen
   },
   MakeRoomNavigation,
   ParticipationNavigation,
