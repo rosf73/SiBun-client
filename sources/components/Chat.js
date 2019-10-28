@@ -8,7 +8,7 @@ class Chat extends Component {
 
         <Image style={styles.image} source={require("../../resources/images/gold.png")}/>
 
-        <View>
+        <View style={{ maxWidth: '70%' }}>
           <Text style={styles.name}>{this.props.user}</Text>
           <View style={styles.bubble}>
             <Text style={styles.content}>{this.props.content}</Text>

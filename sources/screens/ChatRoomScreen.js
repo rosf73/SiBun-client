@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput,
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
-import { useMutation, useSubscription } from 'react-apollo-hooks';
+import { useQuery, useMutation, useSubscription } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 
+import CustomIndicator from '../components/CustomIndicator';
 import Order from '../components/Order';
 import Chat from '../components/Chat';
 import withSuspense from '../withSuspense';
@@ -15,47 +16,40 @@ import { useInput } from '../hooks/useInput';
 function ChatRoomScreen(props) {
   const [ loading, setLoading ] = useState(false);
   const [ folding, setFolding ] = useState(false);
-  const [ chatContentList, setChatContentList ] = useState([]);
   const [ content, setContent ] = useState("");
-  const orderList = []
-  const chatContentsMutation = useMutation(CHAT_CONTENT_LIST, {
+  const { data: { chatContents: prevChatContents } } = useQuery(CHAT_CONTENT_LIST, {
+    suspend: true,
     variables: {
-      roomId: "ck2972zkwnvoy0b60s7umzvm1" //props.roomId
+      roomId: "ck297il22nwp60b602cf4rc4c"
     }
-  })[0];
+  });
+  const [ chatContentList, setChatContentList ] = useState(prevChatContents || []);
   const sendChatMutation = useMutation(SEND_CHAT, {
     variables: {
-      roomId: "ck2972zkwnvoy0b60s7umzvm1", //props.roomId
+      roomId: "ck297il22nwp60b602cf4rc4c", //props.roomId
       content: content
     }
   })[0];
-  const { data: newChat } = useSubscription(NEW_CHAT);
-
-  useEffect(() => {
-    preLoad();
-  }, []);
-
-  async function preLoad() {
-    try { // ComponentWillMount
-      setLoading(true);
-
-      const { data: { chatContents } } = await chatContentsMutation();
-      setChatContentList(chatContents);
-
-      if(newChat !== undefined) {
-        console.log(newChat);
-      }
-
-      setLoading(false);
+  const { data } = useSubscription(NEW_CHAT, {
+    variables: {
+      roomId: "ck297il22nwp60b602cf4rc4c"
     }
-    catch(e) {
-      console.log(e);
-      Alert.alert("what");
+  });
+  const handleNewChats = () => {
+    if(data !== undefined) {
+      const { newChat } = data;
+      setChatContentList(previous => [...previous, newChat]);
     }
-    finally {
-      return; // ComponentDidMount
+    return () => {
+      this.flatListRef.scrollToEnd({ animated: true });
     }
   }
+  const orderList = [];
+
+  useEffect(() => {
+    handleNewChats();
+    setTimeout(() => { this.flatListRef.scrollToEnd({ animated: true }) }, 100);
+  }, [data])
   
   const handlePressExit = () => {
     Alert.alert('', '정말로 이 채팅방을 나가시겠습니까?', [
@@ -80,13 +74,17 @@ function ChatRoomScreen(props) {
   }
   const handlePressSend = async () => {
     try {
-      setLoading(true);
-
-      await sendChatMutation();
-      setContent("");
-      this.flatListRef.scrollToEnd({ animated: true });
-
-      setLoading(false);
+      if(content === "") {
+        Alert.alert("채팅을 입력해주세요")
+      }
+      else {
+        setLoading(true);
+  
+        await sendChatMutation();
+        setContent("");
+  
+        setLoading(false);
+      }
     }
     catch(e) {
       console.log(e);
@@ -96,6 +94,7 @@ function ChatRoomScreen(props) {
 
   return (
     <View style={styles.container}>
+      <CustomIndicator isLoading={loading}/>
       
       <View style={styles.header}>
         <TouchableOpacity

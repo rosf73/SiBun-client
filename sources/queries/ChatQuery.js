@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const CHAT_CONTENT_LIST = gql`
-  mutation chatContents($roomId: String!) {
+  query chatContents($roomId: String!) {
     chatContents(roomId: $roomId) {
       id
       user {
@@ -17,7 +17,7 @@ export const CHAT_CONTENT_LIST = gql`
 `;
 
 export const ROOM_ORDER = gql`
-  mutation getRoomOrder($roomId: String!) {
+  query getRoomOrder($roomId: String!) {
     getRoomOrder(roomId: $roomId) {
       id
       individualOrderList {
@@ -42,8 +42,8 @@ export const SEND_CHAT = gql`
 `;
 
 export const NEW_CHAT = gql`
-  subscription newChat {
-    newChat {
+  subscription newChat($roomId: String!) {
+    newChat(roomId: $roomId) {
       id
       user {
         id

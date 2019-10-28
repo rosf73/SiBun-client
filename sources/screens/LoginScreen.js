@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } fro
 import { useMutation } from 'react-apollo-hooks';
 import axios from 'axios';
 
-//import CustomIndicator from '../components/CustomIndicator';
+import CustomIndicator from '../components/CustomIndicator';
 import { SIGN_IN } from '../queries/UserQuery';
 import { useInput, useNumInput } from '../hooks/useInput';
 
@@ -60,6 +60,8 @@ export default ({ func }) => {
 
   return (
     <View style={styles.container}>
+      <CustomIndicator isLoading={loading}/>
+
       <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
 
       <Text style={styles.text}>학번과 원스톱 비밀번호를 입력해 주세요!</Text>
