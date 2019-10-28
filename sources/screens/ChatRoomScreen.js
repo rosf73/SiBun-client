@@ -1,6 +1,6 @@
-import React, { Component, Suspense } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView, ActivityIndicator, TextInput } from 'react-native';
-import { useQuery } from 'react-apollo-hooks';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput, FlatList } from 'react-native';
+import { useMutation } from 'react-apollo-hooks';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
@@ -8,31 +8,79 @@ import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
 import Order from '../components/Order';
 import Chat from '../components/Chat';
 import withSuspense from '../withSuspense';
-import { CHAT } from '../queries/ChatQuery';
-import { useInput, useNumInput } from '../hooks/useInput';
+import { CHAT_CONTENT_LIST, SEND_CHAT } from '../queries/ChatQuery';
+import { useInput } from '../hooks/useInput';
 
-const ChatRoomScreen = ({ navigation }) => {
-  handlePressExit = () => {
+function ChatRoomScreen({ navigation }) {
+  const [ loading, setLoading ] = useState(false);
+  const [ folding, setFolding ] = useState(false);
+  const [ chatContentList, setChatContentList ] = useState([]);
+  const chatContentsMutation = useMutation(CHAT_CONTENT_LIST, {
+    variables: {
+      roomId: "ck2972zkwnvoy0b60s7umzvm1"
+    }
+  })[0];
+  const sendChatMutation = useMutation(SEND_CHAT, {
+    variables: {
+      roomId: "ck2972zkwnvoy0b60s7umzvm1",
+      content: chatInput.value
+    }
+  })[0];
+
+
+  useEffect(() => {
+    preLoad();
+  }, [chatContentList]);
+
+  async function preLoad() {
+    try { // ComponentWillMount
+      setLoading(true);
+
+      const { data: { chatContents } } = await chatContentsMutation();
+      setChatContentList(chatContents);
+
+      setLoading(false);
+    }
+    catch(e) {
+      console.log(e);
+      Alert.alert("what");
+    }
+    finally {
+      return; // ComponentDidMount
+    }
+  }
+
+  const chatInput = useInput("");
+  const orderList = []
+  
+  const handlePressExit = () => {
     navigation.navigate("Main");
   }
-  handlePressEdit = () => {
+  const handlePressEdit = () => {
     alert('edit!');
   }
-  handlePressFolder = () => {
-    alert('folder!');
+  const handlePressFolder = () => {
+    if(folding)
+      setFolding(false);
+    else
+      setFolding(true);
   }
-  handlePressSend = () => {
-    alert('send!');
-  }
+  const handlePressSend = async () => {
+    try {
+      setLoading(true);
 
-  // const contentList = [
-  //   { id: "1", user: { id: "밥풀이1" }, chatRoom: { id: "1" }, content: "안녕하세요" },
-  //   { id: "2", user: { id: "밥풀이2" }, chatRoom: { id: "1" }, content: "배고파요 ㅠㅠ" },
-  // ];
-  const chatInput = useInput("");
-  const { data, error } = useQuery(CHAT, { suspend: true });
-  console.log(data);
-  const orderList = [];//this.renderOrderList();
+      await sendChatMutation();
+
+      setLoading(false);
+    }
+    catch(e) {
+      console.log(e);
+      Alert.alert("hell");
+    }
+    finally {
+      chatInput.value = "";
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -40,13 +88,13 @@ const ChatRoomScreen = ({ navigation }) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.exit}
-          onPress={this.handlePressExit}>
+          onPress={handlePressExit}>
             <Text style={styles.buttonText}>나가기</Text>
         </TouchableOpacity>
         <Text style={styles.store}>BHC 옥계행복점</Text>
         <TouchableOpacity
           style={{ marginRight: 10 }}
-          onPress={this.handlePressEdit}>
+          onPress={handlePressEdit}>
           <Entypo name="menu" size={30} color="#AAA"/>
         </TouchableOpacity>
       </View>
@@ -56,7 +104,7 @@ const ChatRoomScreen = ({ navigation }) => {
           <Text style={styles.orderTitle}>주문 현황</Text>
           <TouchableOpacity
             style={{ marginRight: 20 }}
-            onPress={this.handlePressFolder}>
+            onPress={handlePressFolder}>
             <FontAwesome name="angle-double-up" size={30} color="#AAA"/>
           </TouchableOpacity>
         </View>
@@ -71,17 +119,20 @@ const ChatRoomScreen = ({ navigation }) => {
         <View style={styles.orderFooter}>
           <TouchableOpacity
             style={styles.ordering}
-            onPress={this.handlePressFolder}>
+            onPress={handlePressFolder}>
             <Text style={styles.buttonText}>주문하기</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.chat}>
-        {/* {data.chatContent.map(chat => (
-          <Chat key={chat.id} user={chat.user.id} chatRoom={chat.chatRoom.id} content={chat.content}/>
-        ))} */null}
-      </ScrollView>
+      <View style={styles.chat}>
+        <FlatList
+          ref={ref => this.flatListRef = ref}
+          data={chatContentList}
+          renderItem={({ item }) =>
+            <Chat user={item.user.number} chatRoom={item.chatRoom.id} content={item.content}/>}
+          keyExtractor={item => item.id}/>
+      </View>
 
       <View style={styles.input}>
         <TextInput
@@ -89,7 +140,7 @@ const ChatRoomScreen = ({ navigation }) => {
           style={styles.textInput}/>
         <TouchableOpacity
           style={{ marginHorizontal: 10 }}
-          onPress={this.handlePressEdit}>
+          onPress={handlePressSend}>
           <SimpleLineIcon name="paper-plane" size={30} color="#666"/>
         </TouchableOpacity>
       </View>

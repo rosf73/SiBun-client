@@ -1,11 +1,12 @@
 import gql from 'graphql-tag';
 
-export const CHAT = gql`
-  query chatContent {
-    chatContent {
+export const CHAT_CONTENT_LIST = gql`
+  mutation chatContents($roomId: String!) {
+    chatContents(roomId: $roomId) {
       id
       user {
         id
+        number
       }
       chatRoom {
         id
@@ -15,6 +16,27 @@ export const CHAT = gql`
   }
 `;
 
-// export const ORDER = gql`
+export const ROOM_ORDER = gql`
+  mutation getRoomOrder($roomId: String!) {
+    getRoomOrder(roomId: $roomId) {
+      id
+      individualOrderList {
+        id
+        user {
+          id
+        }
+        menuList {
+          name
+          price
+        }
+      }
+      state
+    }
+  }
+`;
 
-// `;
+export const SEND_CHAT = gql`
+  mutation sendChat($roomId: String! $content: String!) {
+    sendChat(roomId: $roomId, content: $content)
+  }
+`;

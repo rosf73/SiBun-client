@@ -6,7 +6,7 @@ class Chat extends Component {
     return (
       <View style={styles.container}>
 
-        <Image style={styles.image} source={require("../../resources/images/logo.png")}/>
+        <Image style={styles.image} source={require("../../resources/images/gold.png")}/>
 
         <View>
           <Text style={styles.name}>{this.props.user}</Text>

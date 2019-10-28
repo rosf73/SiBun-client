@@ -102,9 +102,9 @@ class MainScreen extends Component {
             <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
           </Marker>
           {this.state.markers.map((marker) => {
-            const { uri, time, member } = marker;
+            const { id, uri, time, member } = marker;
             return (
-              <Marker {...marker} onPress={this.handlePressMarker}>
+              <Marker {...marker} key={id} onPress={this.handlePressMarker}>
                 <CustomMarker uri={uri} time={time} member={member}/>
               </Marker>
             );

@@ -7,24 +7,29 @@ import { SIGN_IN } from '../queries/UserQuery';
 import { useInput, useNumInput } from '../hooks/useInput';
 
 export default ({ func }) => {
+  const [ loading, setLoading ] = useState(false);
   const numberInput = useNumInput("");
   const pwdInput = useInput("");
-  const onSignIn = useMutation(SIGN_IN, {
+  const signInMutation = useMutation(SIGN_IN, {
     variables: {
       number: numberInput.value,
       pwd: pwdInput.value
     }
   })[0];
 
-  onPressLoginButton = async () => {
+  const onPressLoginButton = async () => {
     try {
-      const { data: { signIn } } = await onSignIn();
+      setLoading(true);
+
+      const { data: { signIn } } = await signInMutation();
       if(signIn) {
         func();
       }
       else {
         Alert.alert("존재하지 않는 아이디입니다");
       }
+
+      setLoading(false);
     }
     catch(e) {
       console.log(e);
@@ -52,7 +57,7 @@ export default ({ func }) => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={this.onPressLoginButton}>
+        onPress={onPressLoginButton}>
         <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>
     </View>
