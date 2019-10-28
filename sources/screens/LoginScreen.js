@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { useMutation } from 'react-apollo-hooks';
-import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
 
 //import CustomIndicator from '../components/CustomIndicator';
 import { SIGN_IN } from '../queries/UserQuery';
@@ -22,15 +22,35 @@ export default ({ func }) => {
     try {
       setLoading(true);
 
-      const { data: { signIn } } = await signInMutation();
-      if(signIn) {
-        func(signIn);
-      }
-      else {
-        Alert.alert("존재하지 않는 아이디입니다");
-      }
+      const formData = new FormData();
 
-      setLoading(false);
+      formData.append('member_id', numberInput.value); // id
+      formData.append('member_pw', pwdInput.value); // password
+      formData.append('referer', 'http://www.kumoh.ac.kr'); // 로그인성공 후 화면 전환
+
+      axios.post('https://www.kumoh.ac.kr:443/cms/login/idLogin.do', formData).
+      then(async (Response) => {
+        // json 파싱
+        var arrayA = Response.headers;
+        var parse = JSON.stringify(arrayA);
+        var parseSet = JSON.parse(parse);
+        
+        if(parseSet["set-cookie"][0].length > 17) {
+          const { data: { signIn } } = await signInMutation();
+          if(signIn) {
+            func(signIn);
+          }
+        }
+        else {
+          Alert.alert("존재하지 않는 아이디이거나 비밀번호 오류입니다");
+        }
+
+        setLoading(false);
+      }).catch(function (error) {
+        console.log(error);
+      })
+      .finally(function () {
+      });
     }
     catch(e) {
       console.log(e);
