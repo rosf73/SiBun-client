@@ -48,6 +48,7 @@ function LoginScreen({ func }) {
         setLoading(false);
       }).catch(function (error) {
         console.log(error);
+        Alert.alert("원스톱에서 로그인 정보 가져오기에 실패하였습니다");
       })
       .finally(function () {
       });

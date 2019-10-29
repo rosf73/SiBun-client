@@ -50,6 +50,7 @@ const App = () => {
         setIsLoggedIn(false);
       }
       // await AsyncStorage.setItem("isLoggedIn", "false");
+      // await AsyncStorage.setItem("TOKEN", "");
       // setIsLoggedIn(false);
 
       await new Promise((resolve) =>
