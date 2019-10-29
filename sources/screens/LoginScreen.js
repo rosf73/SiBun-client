@@ -7,7 +7,7 @@ import CustomIndicator from '../components/CustomIndicator';
 import { SIGN_IN } from '../queries/UserQuery';
 import { useInput, useNumInput } from '../hooks/useInput';
 
-export default ({ func }) => {
+function LoginScreen({ func }) {
   const [ loading, setLoading ] = useState(false);
   const numberInput = useNumInput("");
   const pwdInput = useInput("");
@@ -126,3 +126,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF'
   }
 });
+
+export default LoginScreen;

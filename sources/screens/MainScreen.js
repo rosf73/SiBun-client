@@ -74,6 +74,9 @@ function MainScreen(props) {
     }
   }
 
+  const handlePressProfile = () => {
+    props.navigation.navigate("MyProfile");
+  }
   const handlePressSearch = () => {
 
   }
@@ -84,7 +87,7 @@ function MainScreen(props) {
       <View style={styles.header}>
         <TouchableOpacity
           style={{ marginLeft: 10 }}
-          onPress={handlePressSearch}>
+          onPress={handlePressProfile}>
           <Image style={styles.icon} source={require('../../resources/images/me.png')}/>
         </TouchableOpacity>
         <TextInput

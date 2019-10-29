@@ -8,12 +8,12 @@ import { getMainDefinition } from 'apollo-utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const httpLink = new HttpLink({
-  uri: 'http://192.168.0.4:4000',
+  uri: 'http://192.168.220.141:4000',
   credentials: 'same-origin'
 });
 
 const wsLink = new WebSocketLink({
-  uri: `ws://192.168.0.4:4000`,
+  uri: `ws://192.168.220.141:4000`,
   options: {
     reconnect: true
   }

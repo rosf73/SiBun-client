@@ -9,9 +9,10 @@ import { withNavigation } from 'react-navigation';
 import CustomIndicator from '../components/CustomIndicator';
 import Order from '../components/Order';
 import Chat from '../components/Chat';
+import MyChat from '../components/MyChat';
 import withSuspense from '../withSuspense';
 import { CHAT_CONTENT_LIST, SEND_CHAT, NEW_CHAT } from '../queries/ChatQuery';
-import { useInput } from '../hooks/useInput';
+import { CHECK_ME } from '../queries/UserQuery';
 
 function ChatRoomScreen(props) {
   const [ loading, setLoading ] = useState(false);
@@ -44,6 +45,7 @@ function ChatRoomScreen(props) {
       this.flatListRef.scrollToEnd({ animated: true });
     }
   }
+  const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
   const orderList = [];
 
   useEffect(() => {
@@ -140,7 +142,10 @@ function ChatRoomScreen(props) {
         <FlatList
           ref={ref => this.flatListRef = ref}
           data={chatContentList}
-          renderItem={({ item }) =>
+          renderItem={({ item }) => 
+            checkMe.id === item.user.id ? 
+            <MyChat user={item.user.number} chatRoom={item.chatRoom.id} content={item.content}/>
+            :
             <Chat user={item.user.number} chatRoom={item.chatRoom.id} content={item.content}/>}
           keyExtractor={item => item.id}/>
       </View>

@@ -25,3 +25,14 @@ export const FIND_MY_CHAT_LIST = gql`
     }
   }
 `;
+
+export const CHECK_ME = gql`
+  query checkMe {
+    checkMe {
+      id
+      number
+      score
+      isMe
+    }
+  }
+`;

@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Text, Image } from 'react-native';
 
-class Chat extends Component {
+class MyChat extends Component {
   render() {
     return (
       <View style={styles.container}>
 
-        <Image style={styles.image} source={require("../../resources/images/gold.png")}/>
-
-        <View style={{ maxWidth: '70%', alignItems: 'flex-start' }}>
+        <View style={{ maxWidth: '70%', alignItems: 'flex-end' }}>
           <Text style={styles.name}>{this.props.user}</Text>
           <View style={styles.bubble}>
             <Text style={styles.content}>{this.props.content}</Text>
           </View>
         </View>
+
+        <Image style={styles.image} source={require("../../resources/images/gold.png")}/>
 
       </View>
     );
@@ -23,6 +23,7 @@ class Chat extends Component {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     padding: 10
   },
   image: {
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 100,
     resizeMode: 'contain',
-    marginRight: 15
+    marginLeft: 15
   },
   name: {
     color: '#666'
@@ -41,11 +42,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     marginTop: 10,
-    backgroundColor: '#AFF'
+    backgroundColor: '#FFA'
   },
   content: {
     color: '#666'
   }
 });
 
-export default Chat;
+export default MyChat;
