@@ -22,7 +22,6 @@ const MainNavigation = createStackNavigator({
   ChatRoom: {
     screen: ChatRoomScreen
   },
-  MakeRoomNavigation,
   ParticipationNavigation
 }, {
   headerMode: 'none'

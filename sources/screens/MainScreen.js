@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView, ToastAndroid, BackHandler } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import { useMutation, useQuery } from 'react-apollo-hooks';
@@ -30,7 +30,6 @@ function MainScreen(props) {
 
   useEffect(() => {
     preLoad();
-    console.log(findMyChatList);
   }, [hasLocationPermission]);
 
   async function preLoad() {
@@ -104,7 +103,8 @@ function MainScreen(props) {
 
       <View style={styles.rooms}>
         <ScrollView
-          horizontal={true}>
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}>
           {findMyChatList.map(room => (
             <Room key={room.id} uri={room.store.image} location={room.location}/>
           ))}
