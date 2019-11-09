@@ -1,11 +1,19 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import ChooseCategoryScreen from '../screens/ChooseCategoryScreen';
+import MenuScreen from '../screens/MenuScreen';
+import BasketScreen from '../screens/BasketScreen';
+import ChatRoomScreen from '../screens/ChatRoomScreen';
 
 const OrderNavigation = createStackNavigator({
-  ChooseCategory: {
-    screen: ChooseCategoryScreen
+  Menu: {
+    screen: MenuScreen
+  },
+  Basket: {
+    screen: BasketScreen
+  },
+  ChatRoom: {
+    screen: ChatRoomScreen
   }
 });
 

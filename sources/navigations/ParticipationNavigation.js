@@ -1,12 +1,14 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import ChooseCategoryScreen from '../screens/ChooseCategoryScreen';
+import OpenChatInfoScreen from '../screens/OpenChatInfoScreen';
+import OrderNavigation from './OrderNavigation';
 
 const ParicipationNavigation = createStackNavigator({
-  ChooseCategory: {
-    screen: ChooseCategoryScreen
-  }
+  OpenChatInfo: {
+    screen: OpenChatInfoScreen
+  },
+  OrderNavigation
 });
 
 export default createAppContainer(ParicipationNavigation);

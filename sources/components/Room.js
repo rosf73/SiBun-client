@@ -8,7 +8,7 @@ class Room extends Component {
         <View style={styles.marker}>
           <Image style={styles.image} source={{ uri: this.props.uri }}/>
         </View>
-        <Text>{this.props.location}</Text>
+        <Text style={{ fontSize: 10 }}>{this.props.location}</Text>
       </View>
     );
   }
@@ -17,7 +17,8 @@ class Room extends Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginRight: 15
   },
   marker: {
     borderRadius: 100,
@@ -26,8 +27,8 @@ const styles = StyleSheet.create({
   },
   image: {
     borderRadius: 100,
-    height: 70,
-    width: 70,
+    height: 40,
+    width: 40,
     resizeMode: 'contain'
   }
 });

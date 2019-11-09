@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
@@ -11,8 +11,9 @@ import Order from '../components/Order';
 import Chat from '../components/Chat';
 import MyChat from '../components/MyChat';
 import withSuspense from '../withSuspense';
-import { CHAT_CONTENT_LIST, SEND_CHAT, NEW_CHAT } from '../queries/ChatQuery';
-import { CHECK_ME } from '../queries/UserQuery';
+import { CHAT_CONTENT_LIST, SEND_CHAT, NEW_CHAT, GET_ROOM_ORDER } from '../queries/ChatQuery';
+import { CHECK_ME, EXIT_CHAT_ROOM } from '../queries/UserQuery';
+
 
 function ChatRoomScreen(props) {
   const [ loading, setLoading ] = useState(false);
@@ -21,42 +22,59 @@ function ChatRoomScreen(props) {
   const { data: { chatContents: prevChatContents } } = useQuery(CHAT_CONTENT_LIST, {
     suspend: true,
     variables: {
-      roomId: "ck297il22nwp60b602cf4rc4c"
+      roomId: props.navigation.state.params.roomId
     }
   });
   const [ chatContentList, setChatContentList ] = useState(prevChatContents || []);
   const sendChatMutation = useMutation(SEND_CHAT, {
     variables: {
-      roomId: "ck297il22nwp60b602cf4rc4c", //props.roomId
-      content: content
+      roomId: props.navigation.state.params.roomId, //props.roomId
+      content
     }
   })[0];
   const { data } = useSubscription(NEW_CHAT, {
     variables: {
-      roomId: "ck297il22nwp60b602cf4rc4c"
+      roomId: props.navigation.state.params.roomId
     }
   });
+  const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
+  const { data: { getRoomOrder } } = useQuery(GET_ROOM_ORDER, {
+    suspend: true,
+    variables: {
+      roomId: props.navigation.state.params.roomId
+    }
+  })
+  const [ orderList, setOrderList ] = useState([]);
+  const exitChatRoomMutation = useMutation(EXIT_CHAT_ROOM, {
+    variables: {
+      chatId: props.navigation.state.params.roomId
+    }
+  })[0];
+
   const handleNewChats = () => {
+    console.log(props);
     if(data !== undefined) {
       const { newChat } = data;
       setChatContentList(previous => [...previous, newChat]);
     }
     return () => {
-      this.flatListRef.scrollToEnd({ animated: true });
+      //this.flatListRef.scrollToEnd({ animated: true });
     }
   }
-  const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
-  const orderList = [];
 
   useEffect(() => {
     handleNewChats();
-    setTimeout(() => { this.flatListRef.scrollToEnd({ animated: true }) }, 100);
+    setTimeout(() => { /*this.flatListRef.scrollToEnd({ animated: true })*/ }, 100);
   }, [data])
   
   const handlePressExit = () => {
     Alert.alert('', '정말로 이 채팅방을 나가시겠습니까?', [
       {
-        text: '확인', onPress: () => {
+        text: '확인', onPress: async () => {
+          setLoading(true);
+          await exitChatRoomMutation();
+          setLoading(false);
+
           props.navigation.navigate("Main");
         }
       },
@@ -81,10 +99,8 @@ function ChatRoomScreen(props) {
       }
       else {
         setLoading(true);
-  
         await sendChatMutation();
         setContent("");
-  
         setLoading(false);
       }
     }
@@ -122,8 +138,8 @@ function ChatRoomScreen(props) {
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.orderList}>
-          {orderList.map(order => (
-            <Order key={order.id} user={order.user} menus={order.menuList}/>
+          {getRoomOrder.map(order => (
+            <Order key={order.id} user={order.individualOrderList.user} menus={order.individualOrderList.menuList}/>
           ))}
         </ScrollView>
         <View style={styles.orderPrice}>
@@ -138,17 +154,14 @@ function ChatRoomScreen(props) {
         </View>
       </View>
 
-      <View style={styles.chat}>
-        <FlatList
-          ref={ref => this.flatListRef = ref}
-          data={chatContentList}
-          renderItem={({ item }) => 
-            checkMe.id === item.user.id ? 
-            <MyChat user={item.user.number} chatRoom={item.chatRoom.id} content={item.content}/>
-            :
-            <Chat user={item.user.number} chatRoom={item.chatRoom.id} content={item.content}/>}
-          keyExtractor={item => item.id}/>
-      </View>
+      <ScrollView contentContainerStyle={styles.chat}>
+        {chatContentList.map(chat => 
+          checkMe.id === chat.user.id ? 
+          <MyChat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>
+          :
+          <Chat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>
+        )}
+      </ScrollView>
 
       <View style={styles.input}>
         <TextInput

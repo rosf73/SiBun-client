@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import { useMutation, useQuery } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons'
 
+import Room from '../components/Room'
+import CustomIndicator from '../components/CustomIndicator';
 import CustomMarker from '../components/CustomMarker';
 import withSuspense from '../withSuspense';
 import { useInput } from '../hooks/useInput';
-import { FIND_MY_CHAT_LIST } from '../queries/UserQuery';
+import { GET_CHAT_ROOM_LIST } from '../queries/ChatQuery';
+import { FIND_MY_CHAT_LIST, ENTER_CHAT_ROOM } from '../queries/UserQuery';
+
 
 function MainScreen(props) {
   const [ loading, setLoading ] = useState(false);
   const [ coordinate, setCoordinate ] = useState({ latitude: 0, longitude: 0 });
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
-  const [ markers, setMarkers ] = useState([
-    {
-      id: 'ck2972zkwnvoy0b60s7umzvm1',
-      coordinate: {
-        latitude: 36.1465,
-        longitude: 128.39
-      },
-      uri: 'https://www.bhc.co.kr/images/common/logo300.jpg',
-      time: 13,
-      member: 1
-    }
-  ]);
+  // const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
+  const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
+  const [ chatId, setChatId ] = useState("");
+  const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM, {
+    variables: { chatId }
+  })[0];
   const searchInput = useInput("");
-  //const { data, error } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
+  const anyList = [];
 
   useEffect(() => {
     preLoad();
+    console.log(findMyChatList);
   }, [hasLocationPermission]);
 
   async function preLoad() {
@@ -83,6 +82,7 @@ function MainScreen(props) {
 
   return (
     <View style={styles.container}>
+      <CustomIndicator isLoading={loading}/>
 
       <View style={styles.header}>
         <TouchableOpacity
@@ -101,14 +101,14 @@ function MainScreen(props) {
           <Ionicon name="md-search" size={30} color="#666"/>
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.rooms}>
-        <FlatList
-          ref={ref => this.flatListRef = ref}
-          data={[]}
-          renderItem={({ item }) =>
-            <Room uri={item.image} location={item.location}/>}
-          keyExtractor={item => item.id}/>
+        <ScrollView
+          horizontal={true}>
+          {findMyChatList.map(room => (
+            <Room key={room.id} uri={room.store.image} location={room.location}/>
+          ))}
+        </ScrollView>
       </View>
 
       <MapView
@@ -128,19 +128,32 @@ function MainScreen(props) {
           }}>
           <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
         </Marker>
-        {markers.map((marker) => {
-          const { id, uri, time, member } = marker;
-          const onPress = () => {
-            props.navigation.navigate("ChatRoom", { roomId: "ck2972zkwnvoy0b60s7umzvm1" })
+        {anyList.map((marker) => {
+          const { id, latitude, longitude, store: { name, image }, orderExpectedTime, memberList } = marker;
+          const onPress = async () => {
+            setLoading(true);
+            setChatId(id);
+            await enterChatRoomMutation();
+            props.navigation.navigate("ChatRoom", { roomId: id, storeName: name });
+            setLoading(false);
           }
           return (
-            <Marker {...marker} key={id} onPress={onPress}>
-              <CustomMarker uri={uri} time={time} member={member}/>
+            <Marker
+              coordinate={{ latitude, longitude }}
+              key={id}
+              onPress={onPress}>
+              <CustomMarker uri={image} time={orderExpectedTime} member={memberList.length}/>
             </Marker>
           );
         })}
 
       </MapView>
+
+      <TouchableOpacity
+          style={styles.plus}
+          onPress={handlePressProfile}>
+
+      </TouchableOpacity>
 
     </View>
   );
@@ -193,6 +206,9 @@ const styles = StyleSheet.create({
   me: {
     height: 80,
     resizeMode: 'contain'
+  },
+  plus: {
+    
   }
 });
 

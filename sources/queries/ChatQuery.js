@@ -1,5 +1,24 @@
 import gql from 'graphql-tag';
 
+export const GET_CHAT_ROOM_LIST = gql`
+  query getChatRoomList {
+    getChatRoomList {
+      id
+      location
+      latitude
+      longitude
+      store {
+        name
+        image
+      }
+      orderExpectedTime
+      memberList {
+        id
+      }
+    }
+  }
+`;
+
 export const CHAT_CONTENT_LIST = gql`
   query chatContents($roomId: String!) {
     chatContents(roomId: $roomId) {
@@ -16,7 +35,7 @@ export const CHAT_CONTENT_LIST = gql`
   }
 `;
 
-export const ROOM_ORDER = gql`
+export const GET_ROOM_ORDER = gql`
   query getRoomOrder($roomId: String!) {
     getRoomOrder(roomId: $roomId) {
       id

@@ -4,13 +4,12 @@ import { createStackNavigator } from 'react-navigation-stack';
 import MainScreen from '../screens/MainScreen';
 import SearchScreen from '../screens/SearchScreen';
 import MyProfileScreen from '../screens/MyProfileScreen';
-import OpenChatInfoScreen from '../screens/OpenChatInfoScreen';
 import ChatRoomScreen from '../screens/ChatRoomScreen';
 import MakeRoomNavigation from './MakeRoomNavigation';
 import ParticipationNavigation from './ParticipationNavigation';
-import OrderNavigation from './OrderNavigation';
 
 const MainNavigation = createStackNavigator({
+  MakeRoomNavigation,
   Main: {
     screen: MainScreen
   },
@@ -20,15 +19,11 @@ const MainNavigation = createStackNavigator({
   MyProfile: {
     screen: MyProfileScreen
   },
-  OpenChatInfo: {
-    screen: OpenChatInfoScreen
-  },
   ChatRoom: {
     screen: ChatRoomScreen
   },
   MakeRoomNavigation,
-  ParticipationNavigation,
-  OrderNavigation
+  ParticipationNavigation
 }, {
   headerMode: 'none'
 });

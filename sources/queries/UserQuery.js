@@ -14,9 +14,18 @@ export const ENTER_CHAT_ROOM = gql`
   }
 `;
 
+export const EXIT_CHAT_ROOM = gql`
+  mutation exitChatRoom($chatId: String!) {
+    exitChatRoom(chatId: $chatId) {
+      id
+    }
+  }
+`;
+
 export const FIND_MY_CHAT_LIST = gql`
   query findMyChatList {
     findMyChatList {
+      id
       store {
         image
       }
