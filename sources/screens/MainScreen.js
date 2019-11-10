@@ -4,7 +4,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import { useMutation, useQuery } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
-import Ionicon from 'react-native-vector-icons/Ionicons'
+import Ionicon from 'react-native-vector-icons/Ionicons';
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 import Room from '../components/Room'
 import CustomIndicator from '../components/CustomIndicator';
@@ -17,20 +18,23 @@ import { FIND_MY_CHAT_LIST, ENTER_CHAT_ROOM } from '../queries/UserQuery';
 
 function MainScreen(props) {
   const [ loading, setLoading ] = useState(false);
+  var exitApp = false;
+  const [ timeout, settimeout ] = useState(0);
   const [ coordinate, setCoordinate ] = useState({ latitude: 0, longitude: 0 });
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
-  // const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
+  const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
   const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
-  const [ chatId, setChatId ] = useState("");
-  const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM, {
-    variables: { chatId }
-  })[0];
+  const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM)[0];
   const searchInput = useInput("");
-  const anyList = [];
 
   useEffect(() => {
     preLoad();
-  }, [hasLocationPermission]);
+
+    // BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+    // return () => {
+    //   BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
+    // }
+  }, [getChatRoomList, findMyChatList]);
 
   async function preLoad() {
     try {
@@ -72,11 +76,27 @@ function MainScreen(props) {
     }
   }
 
+  const handlePressBack = () => {
+    if (!exitApp) {
+      ToastAndroid.show('한번 더 누르시면 종료됩니다.', ToastAndroid.SHORT);
+      exitApp = true;
+
+      settimeout(setTimeout(() => { exitApp = false; }, 2000));
+    }
+    else {
+      clearTimeout(timeout);
+      BackHandler.exitApp();
+    }
+    return true;
+  }
   const handlePressProfile = () => {
     props.navigation.navigate("MyProfile");
   }
   const handlePressSearch = () => {
 
+  }
+  const handlePressPlus = () => {
+    props.navigation.navigate("ChooseCategory");
   }
 
   return (
@@ -128,21 +148,29 @@ function MainScreen(props) {
           }}>
           <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
         </Marker>
-        {anyList.map((marker) => {
-          const { id, latitude, longitude, store: { name, image }, orderExpectedTime, memberList } = marker;
+        {getChatRoomList.map((marker) => {
+          const { id, latitude, longitude, store, orderExpectedTime, memberList } = marker;
           const onPress = async () => {
-            setLoading(true);
-            setChatId(id);
-            await enterChatRoomMutation();
-            props.navigation.navigate("ChatRoom", { roomId: id, storeName: name });
-            setLoading(false);
+            try {
+              // setLoading(true);
+              // await enterChatRoomMutation({ variables: { chatId: id } });
+              // setLoading(false);
+
+              props.navigation.navigate("ParticipationNavigation", { roomId: id, storeName: store.name });
+            }
+            catch(e) {
+              Alert.alert("채팅방에 입장할 수 없습니다");
+            }
+            finally {
+              setLoading(false);
+            }
           }
           return (
             <Marker
               coordinate={{ latitude, longitude }}
               key={id}
               onPress={onPress}>
-              <CustomMarker uri={image} time={orderExpectedTime} member={memberList.length}/>
+              <CustomMarker uri={store.image} time={orderExpectedTime} member={memberList.length}/>
             </Marker>
           );
         })}
@@ -150,9 +178,9 @@ function MainScreen(props) {
       </MapView>
 
       <TouchableOpacity
-          style={styles.plus}
-          onPress={handlePressProfile}>
-
+        style={styles.plus}
+        onPress={handlePressPlus}>
+        <AntDesign name="pluscircle" size={55} color="#E2937B"/>
       </TouchableOpacity>
 
     </View>
@@ -208,7 +236,11 @@ const styles = StyleSheet.create({
     resizeMode: 'contain'
   },
   plus: {
-    
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    borderRadius: 100,
+    backgroundColor: '#FFF'
   }
 });
 

@@ -4,7 +4,6 @@ import { createStackNavigator } from 'react-navigation-stack';
 import ChooseCategoryScreen from '../screens/ChooseCategoryScreen';
 import ChooseStoreScreen from '../screens/ChooseStoreScreen';
 import InputOrderInfoScreen from '../screens/InputOrderInfoScreen';
-import SelectAddressScreen from '../screens/SelectAddressScreen';
 import OrderNavigation from './OrderNavigation';
 
 const MakeRoomNavigation = createStackNavigator({
@@ -16,9 +15,6 @@ const MakeRoomNavigation = createStackNavigator({
   },
   InputOrderInfo: {
     screen: InputOrderInfoScreen
-  },
-  SelectAddress: {
-    screen: SelectAddressScreen
   },
   OrderNavigation
 }, {

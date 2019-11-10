@@ -15,6 +15,8 @@ const OrderNavigation = createStackNavigator({
   ChatRoom: {
     screen: ChatRoomScreen
   }
+}, {
+  headerMode: 'none'
 });
 
 export default createAppContainer(OrderNavigation);

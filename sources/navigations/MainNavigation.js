@@ -9,7 +9,6 @@ import MakeRoomNavigation from './MakeRoomNavigation';
 import ParticipationNavigation from './ParticipationNavigation';
 
 const MainNavigation = createStackNavigator({
-  MakeRoomNavigation,
   Main: {
     screen: MainScreen
   },
@@ -22,6 +21,7 @@ const MainNavigation = createStackNavigator({
   ChatRoom: {
     screen: ChatRoomScreen
   },
+  MakeRoomNavigation,
   ParticipationNavigation
 }, {
   headerMode: 'none'
