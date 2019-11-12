@@ -18,7 +18,19 @@ function MenuScreen(props) {
   });
   
   const handlePressBack = () => {
-    Alert.alert('', '방 만들기를 취소할까요?', [
+    if(props.navigation.state.params.boss)
+      Alert.alert('', '방 만들기를 취소할까요?', [
+        {
+          text: '확인', onPress: async () => {
+            props.navigation.popToTop();
+          }
+        },
+        {
+          text: '취소', onPress: () => { }
+        }
+      ]);
+    else
+    Alert.alert('', '참여하기를 그만두시나요?', [
       {
         text: '확인', onPress: async () => {
           props.navigation.popToTop();

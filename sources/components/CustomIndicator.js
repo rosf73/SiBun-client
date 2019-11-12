@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around'
   },
   logo: {
-    height: '13%',
+    height: 200,
+    width: 200,
     resizeMode: 'contain',
     marginBottom: 25
   }

@@ -19,13 +19,13 @@ function ChatRoomScreen(props) {
   const [ loading, setLoading ] = useState(false);
   const [ folding, setFolding ] = useState(false);
   const [ content, setContent ] = useState("");
-  const { data: { chatContents: prevChatContents } } = useQuery(CHAT_CONTENT_LIST, {
+  const { data: { chatContents } } = useQuery(CHAT_CONTENT_LIST, {
     suspend: true,
     variables: {
       roomId: props.navigation.state.params.roomId
     }
   });
-  const [ chatContentList, setChatContentList ] = useState(prevChatContents || []);
+  const [ chatContentList, setChatContentList ] = useState(chatContents || []);
   const sendChatMutation = useMutation(SEND_CHAT, {
     variables: {
       roomId: props.navigation.state.params.roomId, //props.roomId
@@ -44,7 +44,6 @@ function ChatRoomScreen(props) {
       roomId: props.navigation.state.params.roomId
     }
   })
-  const [ orderList, setOrderList ] = useState([]);
   const exitChatRoomMutation = useMutation(EXIT_CHAT_ROOM, {
     variables: {
       chatId: props.navigation.state.params.roomId
@@ -52,7 +51,6 @@ function ChatRoomScreen(props) {
   })[0];
 
   const handleNewChats = () => {
-    console.log(props);
     if(data !== undefined) {
       const { newChat } = data;
       setChatContentList(previous => [...previous, newChat]);
@@ -138,7 +136,7 @@ function ChatRoomScreen(props) {
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.orderList}>
-          {getRoomOrder.map(order => (
+          {getRoomOrder.individualOrderList.map(order => (
             <Order key={order.id} user={order.individualOrderList.user} menus={order.individualOrderList.menuList}/>
           ))}
         </ScrollView>

@@ -9,18 +9,17 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import Room from '../components/Room'
-import CustomIndicator from '../components/CustomIndicator';
 import CustomMarker from '../components/CustomMarker';
 import withSuspense from '../withSuspense';
 import { useInput } from '../hooks/useInput';
 import { GET_CHAT_ROOM_LIST } from '../queries/ChatQuery';
-import { FIND_MY_CHAT_LIST, ENTER_CHAT_ROOM } from '../queries/UserQuery';
+import { FIND_MY_CHAT_LIST, CHECK_ME } from '../queries/UserQuery';
 
 
 function MainScreen(props) {
-  const [ loading, setLoading ] = useState(false);
   const [ coordinate, setCoordinate ] = useState({ latitude: 0, longitude: 0 });
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
+  const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
   const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
   const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
   const searchInput = useInput("");
@@ -86,8 +85,7 @@ function MainScreen(props) {
 
   return (
     <View style={styles.container}>
-      <CustomIndicator isLoading={loading}/>
-
+      
       <View style={styles.header}>
         <TouchableOpacity
           style={{ marginLeft: 10 }}
@@ -135,7 +133,21 @@ function MainScreen(props) {
         </Marker>
         {getChatRoomList.map((marker) => {
           const { id, latitude, longitude, store, orderExpectedTime, memberList } = marker;
+          const newDate = new Date();
+          var now = newDate.getFullYear()+"-"+(newDate.getMonth()+1)+"-"+newDate.getDate()+"T";
+          if(newDate.getHours()<10)
+            now += "0"+newDate.getHours()+":"+newDate.getMinutes()+":00";
+          else
+            now += newDate.getHours()+":"+newDate.getMinutes()+":00";
+          const formattedTime = String(Math.floor(
+            (new Date(String(orderExpectedTime).substr(0,16))-new Date(now))/1000/60
+          ));
           const onPress = () => {
+            for(var i=0; i<memberList.length; i++)
+              if(memberList[i]["id"] === checkMe.id) {
+                props.navigation.navigate("ChatRoom", { roomId: id });
+                return;
+              }
             props.navigation.navigate("ParticipationNavigation", { roomId: id });
           }
           return (
@@ -143,7 +155,7 @@ function MainScreen(props) {
               coordinate={{ latitude, longitude }}
               key={id}
               onPress={onPress}>
-              <CustomMarker uri={store.image} time={orderExpectedTime} member={memberList.length}/>
+              <CustomMarker uri={store.image} time={formattedTime} member={memberList.length}/>
             </Marker>
           );
         })}

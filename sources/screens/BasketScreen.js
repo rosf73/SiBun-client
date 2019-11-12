@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Text, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { useMutation } from 'react-apollo-hooks';
@@ -7,8 +7,10 @@ import withSuspense from '../withSuspense';
 import Item from '../components/Item';
 import { CREATE_CHAT_ROOM } from '../queries/ChatQuery';
 import { ENTER_CHAT_ROOM } from '../queries/UserQuery';
+import CustomIndicator from '../components/CustomIndicator';
 
 function BasketScreen(props) {
+  const [ loading, setLoading ] = useState(false);
   const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM)[0];
   const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM)[0];
 
@@ -42,7 +44,7 @@ function BasketScreen(props) {
         setLoading(true);
         const { data: { enterChatRoom: { id } } } = await enterChatRoomMutation({
           variables: {
-            chatId: props.navigation.state.params.roomId
+            roomId: props.navigation.state.params.roomId
           }
         });
         setLoading(false);
@@ -60,6 +62,7 @@ function BasketScreen(props) {
 
   return (
     <View style={styles.container}>
+      <CustomIndicator isLoading={loading}/>
       
       <View style={styles.header}>
         <TouchableOpacity
@@ -124,7 +127,6 @@ const styles = StyleSheet.create({
     height: 80,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
     backgroundColor: '#FFF',
     borderBottomColor: '#CCC',
     borderBottomWidth: 1

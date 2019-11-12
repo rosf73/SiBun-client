@@ -20,7 +20,7 @@ function OpenChatInfoScreen(props) {
   const handlePressParty = () => {
     props.navigation.navigate("OrderNavigation", {
       storeName: getChatRoom.store.name,
-      roomId: getChatRoom.store.id,
+      roomId: props.navigation.state.params.roomId,
       boss: false
     });
   }
