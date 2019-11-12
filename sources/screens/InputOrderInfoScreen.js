@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Picker, Alert } from 'react-native';
-import { useMutation } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
-import CustomIndicator from '../components/CustomIndicator';
-import { CREATE_CHAT_ROOM } from '../queries/ChatQuery';
-
 function InputOrderInfoScreen(props) {
-  const [ loading, setLoading ] = useState(false);
   const [ location, setLocation ] = useState("");
   const [ time, setTime ] = useState({ hour: 0, min: 0 });
   var minList = [];
@@ -18,13 +13,13 @@ function InputOrderInfoScreen(props) {
     else
       minList.push(String(i));
   }
-  const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM, {
-    variables: {
-      storeName: props.navigation.state.params.store,
-      location,
-      time: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+"T"+time.hour+":"+time.min+":00"
-    }
-  })[0];
+  // const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM, {
+  //   variables: {
+  //     storeName: props.navigation.state.params.store,
+  //     location,
+  //     time
+  //   }
+  // })[0];
 
   useEffect(() => {
     initTime();
@@ -50,42 +45,33 @@ function InputOrderInfoScreen(props) {
     if(location === "")
       Alert.alert("주소지를 선택해주세요");
     else if((new Date().getHours() < time.hour && new Date().getMinutes() < time.min)
-         || (new Date().getHours() == time.hour && new Date().getMinutes()+10 >= time.min))
+         || (new Date().getHours() == time.hour && new Date().getMinutes()+10 > time.min)) {
       Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
+      initTime();
+    }
     else {
-      setLoading(true);
-      const { data: { createChatRoom: { id } } } = await createChatRoomMutation();
-      setLoading(false);
+      // setLoading(true);
+      // const { data: { createChatRoom: { id } } } = await createChatRoomMutation();
+      // setLoading(false);
+      var id = 0;
 
       props.navigation.navigate("OrderNavigation", {
         storeName: props.navigation.state.params.store,
+        time: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+"T"+time.hour+":"+time.min,
+        location,
         roomId: id
       });
     }
   }
   const handleChangeHours = (itemValue, itemPosition) => {
-    if((new Date().getHours() < itemValue && new Date().getMinutes() < time.min)
-    || (new Date().getHours() == itemValue && new Date().getMinutes()+10 >= time.min)) {
-      Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
-      initTime();
-    }
-    else
-      setTime({ hour: itemValue, min: time.min });
+    setTime({ hour: itemValue, min: time.min });
   }
   const handleChangeMins = (itemValue, itemPosition) => {
-    if((new Date().getHours() < time.hour && new Date().getMinutes() < itemValue)
-    || (new Date().getHours() == time.hour && new Date().getMinutes()+10 >= itemValue)) {
-      Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
-      initTime();
-    }
-    else
-      setTime({ hour: time.hour, min: itemValue });
+    setTime({ hour: time.hour, min: itemValue });
   }
 
   return (
     <View style={styles.container}>
-      <CustomIndicator isLoading={loading}/>
-    
       <View style={styles.header}>
         <TouchableOpacity
           style={{ marginLeft: 15 }}
@@ -154,7 +140,7 @@ function InputOrderInfoScreen(props) {
             onValueChange={handleChangeMins}>
             {
               minList.map((item, index) => (
-                <Picker.item key={index} label={String(item)} value={item}/>
+                <Picker.item key={index} label={item} value={item}/>
               ))
             }
           </Picker>

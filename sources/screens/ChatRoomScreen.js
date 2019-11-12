@@ -154,14 +154,16 @@ function ChatRoomScreen(props) {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.chat}>
-        {chatContentList.map(chat => 
-          checkMe.id === chat.user.id ? 
-          <MyChat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>
-          :
-          <Chat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>
-        )}
-      </ScrollView>
+      <View style={styles.chat}>
+        <ScrollView>
+          {chatContentList.map(chat => 
+            checkMe.id === chat.user.id ? 
+            <MyChat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>
+            :
+            <Chat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>
+          )}
+        </ScrollView>
+      </View>
 
       <View style={styles.input}>
         <TextInput

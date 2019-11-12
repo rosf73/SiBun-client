@@ -53,7 +53,8 @@ const styles = StyleSheet.create({
   marker: {
     borderRadius: 100,
     borderColor: '#666',
-    borderWidth: 2
+    borderWidth: 2,
+    backgroundColor: '#FFF'
   },
   image: {
     borderRadius: 100,

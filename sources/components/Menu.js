@@ -13,7 +13,7 @@ class Menu extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.left}>
+        <View>
           <Text>{this.props.name}</Text>
           <Text>{this.props.price}</Text>
         </View>
@@ -21,13 +21,21 @@ class Menu extends Component {
         <View style={styles.right}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => this.setState({ quantity: this.state.quantity+1 })}>
-            ＋</TouchableOpacity>
+            onPress={() => {
+              this.props.onPlus();
+              this.setState({ quantity: this.state.quantity+1 })
+            }}>
+            <Text>＋</Text></TouchableOpacity>
           <Text style={styles.button}>{this.state.quantity}</Text>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => this.setState({ quantity: this.state.quantity+1 })}>
-            －</TouchableOpacity>
+            onPress={() => {
+              if(this.state.quantity > 0) {
+                this.props.onMinus();
+                this.setState({ quantity: this.state.quantity-1 })
+              }
+            }}>
+            <Text>－</Text></TouchableOpacity>
         </View>
       </View>
     );
@@ -37,16 +45,15 @@ class Menu extends Component {
 const styles = StyleSheet.create({
   container: {
     height: 110,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF'
-  },
-  left: {
-    flex: 1
+    justifyContent: 'space-around',
+    backgroundColor: '#FFF',
+    borderBottomColor: '#CCC',
+    borderBottomWidth: 1
   },
   right: {
-    flex: 1,
     flexDirection: 'row',
   },
   button: {

@@ -53,10 +53,10 @@ const App = () => {
       // await AsyncStorage.setItem("TOKEN", "");
       // setIsLoggedIn(false);
 
-      await new Promise((resolve) =>
-        setTimeout(
-          () => { resolve('result') }, 1000
-        ));
+      // await new Promise((resolve) =>
+      //   setTimeout(
+      //     () => { resolve('result') }, 1000
+      //   ));
 
       setLoaded(true);
     } catch(e) {
