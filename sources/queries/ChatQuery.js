@@ -1,5 +1,13 @@
 import gql from 'graphql-tag';
 
+export const CREATE_CHAT_ROOM = gql`
+  mutation createChatRoom($storeName: String! $location: String! $time: DateTime!) {
+    createChatRoom(storeName: $storeName location: $location time: $time) {
+      id
+    }
+  }
+`;
+
 export const GET_CHAT_ROOM_LIST = gql`
   query getChatRoomList {
     getChatRoomList {

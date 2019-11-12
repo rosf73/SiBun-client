@@ -13,8 +13,7 @@ function LoginScreen({ func }) {
   const pwdInput = useInput("");
   const signInMutation = useMutation(SIGN_IN, {
     variables: {
-      number: numberInput.value,
-      pwd: pwdInput.value
+      number: numberInput.value
     }
   })[0];
 

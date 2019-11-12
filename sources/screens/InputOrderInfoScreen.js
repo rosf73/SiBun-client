@@ -1,25 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Picker, BackHandler } from 'react-native';
-import { useQuery } from 'react-apollo-hooks';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Picker, Alert } from 'react-native';
+import { useMutation } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
-import withSuspense from '../withSuspense';
+import CustomIndicator from '../components/CustomIndicator';
+import { CREATE_CHAT_ROOM } from '../queries/ChatQuery';
 
 function InputOrderInfoScreen(props) {
+  const [ loading, setLoading ] = useState(false);
+  const [ location, setLocation ] = useState("");
   const [ time, setTime ] = useState({ hour: 0, min: 0 });
+  var minList = [];
+  for(var i=0; i<60; i++) {
+    if(i < 10)
+      minList.push("0"+i);
+    else
+      minList.push(String(i));
+  }
+  const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM, {
+    variables: {
+      storeName: props.navigation.state.params.store,
+      location,
+      time: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+"T"+time.hour+":"+time.min+":00"
+    }
+  })[0];
 
+  useEffect(() => {
+    initTime();
+  }, []);
+
+  const initTime = () => {
+    if(new Date().getMinutes() < 50)
+      setTime({
+        hour: new Date().getHours(),
+        min: (new Date().getMinutes()+10)
+      });
+    else
+      setTime({
+        hour: (new Date().getHours()+1)%24,
+        min: "0"+(new Date().getMinutes()-50)
+      });
+  }
   const handlePressBack = () => {
     props.navigation.goBack();
     return true;
   };
-  const handlePressConfirm = () => {
-    props.navigation.navigate("OrderNavigation", {  });
+  const handlePressConfirm = async () => {
+    if(location === "")
+      Alert.alert("주소지를 선택해주세요");
+    else if((new Date().getHours() < time.hour && new Date().getMinutes() < time.min)
+         || (new Date().getHours() == time.hour && new Date().getMinutes()+10 >= time.min))
+      Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
+    else {
+      setLoading(true);
+      const { data: { createChatRoom: { id } } } = await createChatRoomMutation();
+      setLoading(false);
+
+      props.navigation.navigate("OrderNavigation", {
+        storeName: props.navigation.state.params.store,
+        roomId: id
+      });
+    }
+  }
+  const handleChangeHours = (itemValue, itemPosition) => {
+    if((new Date().getHours() < itemValue && new Date().getMinutes() < time.min)
+    || (new Date().getHours() == itemValue && new Date().getMinutes()+10 >= time.min)) {
+      Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
+      initTime();
+    }
+    else
+      setTime({ hour: itemValue, min: time.min });
+  }
+  const handleChangeMins = (itemValue, itemPosition) => {
+    if((new Date().getHours() < time.hour && new Date().getMinutes() < itemValue)
+    || (new Date().getHours() == time.hour && new Date().getMinutes()+10 >= itemValue)) {
+      Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
+      initTime();
+    }
+    else
+      setTime({ hour: time.hour, min: itemValue });
   }
 
   return (
     <View style={styles.container}>
-
+      <CustomIndicator isLoading={loading}/>
+    
       <View style={styles.header}>
         <TouchableOpacity
           style={{ marginLeft: 15 }}
@@ -29,7 +95,7 @@ function InputOrderInfoScreen(props) {
       </View>
       
       <Text style={{ fontSize: 20, padding: 20, paddingBottom: 0 }}>{props.navigation.state.params.store}</Text>
-      <Text style={styles.description}>배달지를 입력해주세요</Text>
+      <Text style={styles.description}>배달지를 선택해주세요</Text>
       
       <View style={styles.client}>
         <GooglePlacesAutocomplete
@@ -38,6 +104,9 @@ function InputOrderInfoScreen(props) {
           autoFocus={false}
           returnKeyType={'default'}
           fetchDetails={true}
+          onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+            setLocation(data.description);
+          }}
           query={{
             key: 'AIzaSyDbd8LzMXuc_A3Bkqznl9EjwF-HaQZ-v4w',
             language: 'ko',
@@ -69,22 +138,27 @@ function InputOrderInfoScreen(props) {
           nearbyPlacesAPI="GooglePlacesSearch"/>
         <Text style={styles.description}>예상 주문 시간을 선택해 주세요</Text>
         <View style={styles.time}>
+          <Text>{time.hour}</Text>
           <Picker
             selectedValue={time.hour}
-            style={{ width: 70, height: 30 }}
-            onValueChange={(itemValue, itemPosition) => setTime({ hour: itemValue, min: time.min })}>
-            <Picker.Item label="0" value={0}/>
-            <Picker.Item label="1" value={1}/>
+            style={{ width: 30, height: 30 }}
+            onValueChange={handleChangeHours}>
+            <Picker.Item label={String(new Date().getHours())} value={new Date().getHours()}/>
+            <Picker.Item label={String((new Date().getHours()+1)%24)} value={(new Date().getHours()+1)%24}/>
           </Picker>
-          <Text>시</Text>
+          <Text style={{ fontSize: 18, marginRight: 20 }}>시</Text>
+          <Text>{time.min}</Text>
           <Picker
             selectedValue={time.min}
-            style={{ width: 70, height: 30 }}
-            onValueChange={(itemValue, itemPosition) => setTime({ hour: time.hour, min: itemValue })}>
-            <Picker.Item label="0" value={0}/>
-            <Picker.Item label="1" value={1}/>
+            style={{ width: 30, height: 30 }}
+            onValueChange={handleChangeMins}>
+            {
+              minList.map((item, index) => (
+                <Picker.item key={index} label={String(item)} value={item}/>
+              ))
+            }
           </Picker>
-          <Text>분</Text>
+          <Text style={{ fontSize: 18 }}>분</Text>
         </View>
       </View>
       
@@ -122,7 +196,8 @@ const styles = StyleSheet.create({
     flex: 1
   },
   time: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    paddingLeft: 35
   },
   comfirm: {
     width: '100%',
@@ -133,5 +208,4 @@ const styles = StyleSheet.create({
   }
 });
 
-// export default withSuspense(withNavigation(InputOrderInfoScreen));
 export default withNavigation(InputOrderInfoScreen);

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView, ToastAndroid, BackHandler } from 'react-native';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import { useMutation, useQuery } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import Room from '../components/Room'
 import CustomIndicator from '../components/CustomIndicator';
@@ -18,8 +19,6 @@ import { FIND_MY_CHAT_LIST, ENTER_CHAT_ROOM } from '../queries/UserQuery';
 
 function MainScreen(props) {
   const [ loading, setLoading ] = useState(false);
-  var exitApp = false;
-  const [ timeout, settimeout ] = useState(0);
   const [ coordinate, setCoordinate ] = useState({ latitude: 0, longitude: 0 });
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
   const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
@@ -29,12 +28,7 @@ function MainScreen(props) {
 
   useEffect(() => {
     preLoad();
-
-    // BackHandler.addEventListener("hardwareBackPress", handlePressBack);
-    // return () => {
-    //   BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
-    // }
-  }, [getChatRoomList, findMyChatList]);
+  }, []);
 
   async function preLoad() {
     try {
@@ -57,43 +51,35 @@ function MainScreen(props) {
       console.warn(err);
     }
     finally {
-      if (hasLocationPermission) {
-        Geolocation.getCurrentPosition(
-          (position) => {
-            setCoordinate({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            })
-          },
-          (error) => {
-            console.log(error.code, error.message);
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        );
-      }
-  
+      if (hasLocationPermission)
+        positioning();
       return;
     }
   }
 
-  const handlePressBack = () => {
-    if (!exitApp) {
-      ToastAndroid.show('한번 더 누르시면 종료됩니다.', ToastAndroid.SHORT);
-      exitApp = true;
-
-      settimeout(setTimeout(() => { exitApp = false; }, 2000));
-    }
-    else {
-      clearTimeout(timeout);
-      BackHandler.exitApp();
-    }
-    return true;
+  const positioning = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        setCoordinate({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
+      },
+      (error) => {
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
   }
+
   const handlePressProfile = () => {
     props.navigation.navigate("MyProfile");
   }
   const handlePressSearch = () => {
-
+    props.navigation.navigate("Search");
+  }
+  const handlePressPositioning = () => {
+    positioning();
   }
   const handlePressPlus = () => {
     props.navigation.navigate("ChooseCategory");
@@ -178,6 +164,12 @@ function MainScreen(props) {
       </MapView>
 
       <TouchableOpacity
+        style={styles.myPosition}
+        onPress={handlePressPositioning}>
+        <MaterialIcons name="my-location" size={25} color="#666"/>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={styles.plus}
         onPress={handlePressPlus}>
         <AntDesign name="pluscircle" size={55} color="#E2937B"/>
@@ -234,6 +226,17 @@ const styles = StyleSheet.create({
   me: {
     height: 80,
     resizeMode: 'contain'
+  },
+  myPosition: {
+    position: 'absolute',
+    right: 20,
+    bottom: 85,
+    height: 55,
+    width: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 100,
+    backgroundColor: '#FFF'
   },
   plus: {
     position: 'absolute',

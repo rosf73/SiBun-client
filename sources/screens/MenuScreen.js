@@ -1,14 +1,24 @@
-import React, { Component } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { withNavigation } from 'react-navigation';
+import { useQuery } from 'react-apollo-hooks';
 
-class MenuScreen extends Component {
-  render() {
-    return (
-      <View>
+import withSuspense from '../withSuspense';
+import { GET_MENU_LIST } from '../queries/OrderQuery';
+import Menu from '../components/Menu';
 
-      </View>
-    );
-  }
+function MenuScreen(props) {
+  const { data: { getStoreMenu: menuList }} = useQuery(GET_MENU_LIST, { suspend: true });
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        {menuList.map(menu => (
+          <Menu key={menu.id} name={menu.name} price={menu.price}/>
+        ))}
+      </ScrollView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -20,4 +30,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default MenuScreen;
+export default withNavigation(MenuScreen);

@@ -1,26 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useQuery } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 
 import withSuspense from '../withSuspense';
 import Category from '../components/Category';
+import { GET_STORE_LIST } from '../queries/OrderQuery';
 
 function ChooseStoreScreen(props) {
-  const storeList = [
-    {
-      store: "BHC 옥계점",
-      uri: "https://previews.123rf.com/images/airdone/airdone1608/airdone160800034/60658875-%EC%BB%AC%EB%9F%AC-%EB%82%99%EC%84%9C-%EC%8A%A4%ED%83%80%EC%9D%BC%EC%9D%98-%EC%B9%98%ED%82%A8-%EB%B6%81%EC%9D%98-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4-%EC%85%98.jpg"
-    },
-    {
-      store: "왕초",
-      uri: "https://previews.123rf.com/images/airdone/airdone1608/airdone160800034/60658875-%EC%BB%AC%EB%9F%AC-%EB%82%99%EC%84%9C-%EC%8A%A4%ED%83%80%EC%9D%BC%EC%9D%98-%EC%B9%98%ED%82%A8-%EB%B6%81%EC%9D%98-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4-%EC%85%98.jpg"
-    },
-    {
-      store: "깻잎 두마리치킨",
-      uri: "https://previews.123rf.com/images/airdone/airdone1608/airdone160800034/60658875-%EC%BB%AC%EB%9F%AC-%EB%82%99%EC%84%9C-%EC%8A%A4%ED%83%80%EC%9D%BC%EC%9D%98-%EC%B9%98%ED%82%A8-%EB%B6%81%EC%9D%98-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4-%EC%85%98.jpg"
-    },
-  ];
+  const { data: { getStoreList } } = useQuery(GET_STORE_LIST, {
+    suspend: true,
+    variables: {
+      storeCategoryName: props.navigation.state.params.category
+    }
+  });
 
   const handlePressBack = () => {
     props.navigation.goBack();
@@ -41,13 +34,13 @@ function ChooseStoreScreen(props) {
       <Text style={styles.store}>매장을 선택해주세요</Text>
       
       <View style={styles.client}>
-        {props.navigation.state.params.category !== "치킨" ?
+        {getStoreList.length === 0 ?
         <Text>주변에 이용할 수 있는 매장이 없습니다</Text>
         :
-        storeList.map(item => {
-          const handlePress = () => { props.navigation.navigate("InputOrderInfo", { store: item.store }); }
+        getStoreList.map(item => {
+          const handlePress = () => { props.navigation.navigate("InputOrderInfo", { store: item.name }); }
 
-          return <Category category={item.store} uri={item.uri} onPress={handlePress}/>;
+          return <Category key={item.id} category={item.name} uri={item.image} onPress={handlePress}/>;
         })}
       </View>
 
@@ -82,5 +75,4 @@ const styles = StyleSheet.create({
   }
 });
 
-// export default withSuspense(withNavigation(ChooseStoreScreen));
-export default withNavigation(ChooseStoreScreen);
+export default withSuspense(withNavigation(ChooseStoreScreen));
