@@ -1,20 +1,17 @@
 import React from 'react';
-import { StyleSheet, View, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Modal, Image, ActivityIndicator } from 'react-native';
 
-const CustomIndicator = props => {
-  const {
-    isLoading
-  } = props;
-
+function CustomIndicator(props) {
   return (
     <Modal
       transparent={true}
       animationType={'none'}
-      visible={isLoading}
+      visible={props.isLoading}
       onRequestClose={() => {console.log('Close modal')}}>
       <View style={styles.modalBackground}>
         <View style={styles.activityIndicatorWrapper}>
-          <ActivityIndicator size="large" color="#0000ff"/>
+          <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
+          <ActivityIndicator/>
         </View>
       </View>
     </Modal>
@@ -36,6 +33,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-around'
+  },
+  logo: {
+    height: '13%',
+    resizeMode: 'contain',
+    marginBottom: 25
   }
 });
 

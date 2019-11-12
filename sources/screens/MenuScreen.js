@@ -32,14 +32,24 @@ function MenuScreen(props) {
   const handlePressBasket = () => {
     if(basket.length === 0)
       Alert.alert("메뉴를 담아주세요");
-    else
-      props.navigation.navigate("Basket", {
-        storeName: props.navigation.state.params.storeName,
-        roomId: props.navigation.state.params.roomId,
-        time: props.navigation.state.params.time,
-        location: props.navigation.state.params.location,
-        basket
-      });
+    else {
+      var list = [];
+      for(var i=0; i<basket.length; i++)
+        if(basket[i].quantity > 0)
+          list.push(basket[i]);
+      if(props.navigation.state.params.boss)
+        props.navigation.navigate("Basket", {
+          storeName: props.navigation.state.params.storeName,
+          time: props.navigation.state.params.time,
+          location: props.navigation.state.params.location,
+          basket: list
+        });
+      else
+        props.navigation.navigate("Basket", {
+          roomId: props.navigation.state.params.roomId,
+          basket: list
+        });
+    }
   }
 
   return (

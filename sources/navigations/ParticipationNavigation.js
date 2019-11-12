@@ -9,6 +9,8 @@ const ParicipationNavigation = createStackNavigator({
     screen: OpenChatInfoScreen
   },
   OrderNavigation
+}, {
+  headerMode: 'none'
 });
 
 export default createAppContainer(ParicipationNavigation);

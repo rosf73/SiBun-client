@@ -17,7 +17,6 @@ function ChooseStoreScreen(props) {
 
   const handlePressBack = () => {
     props.navigation.goBack();
-    return true;
   };
 
   return (

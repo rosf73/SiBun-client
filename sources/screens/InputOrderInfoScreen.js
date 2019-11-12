@@ -13,13 +13,6 @@ function InputOrderInfoScreen(props) {
     else
       minList.push(String(i));
   }
-  // const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM, {
-  //   variables: {
-  //     storeName: props.navigation.state.params.store,
-  //     location,
-  //     time
-  //   }
-  // })[0];
 
   useEffect(() => {
     initTime();
@@ -41,7 +34,7 @@ function InputOrderInfoScreen(props) {
     props.navigation.goBack();
     return true;
   };
-  const handlePressConfirm = async () => {
+  const handlePressConfirm = () => {
     if(location === "")
       Alert.alert("주소지를 선택해주세요");
     else if((new Date().getHours() < time.hour && new Date().getMinutes() < time.min)
@@ -50,16 +43,11 @@ function InputOrderInfoScreen(props) {
       initTime();
     }
     else {
-      // setLoading(true);
-      // const { data: { createChatRoom: { id } } } = await createChatRoomMutation();
-      // setLoading(false);
-      var id = 0;
-
       props.navigation.navigate("OrderNavigation", {
         storeName: props.navigation.state.params.store,
         time: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+"T"+time.hour+":"+time.min,
         location,
-        roomId: id
+        boss: true
       });
     }
   }

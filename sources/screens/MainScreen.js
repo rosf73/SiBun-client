@@ -23,7 +23,6 @@ function MainScreen(props) {
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
   const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
   const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
-  const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM)[0];
   const searchInput = useInput("");
 
   useEffect(() => {
@@ -136,20 +135,8 @@ function MainScreen(props) {
         </Marker>
         {getChatRoomList.map((marker) => {
           const { id, latitude, longitude, store, orderExpectedTime, memberList } = marker;
-          const onPress = async () => {
-            try {
-              // setLoading(true);
-              // await enterChatRoomMutation({ variables: { chatId: id } });
-              // setLoading(false);
-
-              props.navigation.navigate("ParticipationNavigation", { roomId: id, storeName: store.name });
-            }
-            catch(e) {
-              Alert.alert("채팅방에 입장할 수 없습니다");
-            }
-            finally {
-              setLoading(false);
-            }
+          const onPress = () => {
+            props.navigation.navigate("ParticipationNavigation", { roomId: id });
           }
           return (
             <Marker

@@ -27,6 +27,22 @@ export const GET_CHAT_ROOM_LIST = gql`
   }
 `;
 
+export const CHAT_INFO = gql`
+  query getChatRoom($roomId: String!){
+    getChatRoom(roomId: $roomId){
+      store{
+        image
+        name
+      }
+      memberList{
+        number
+      }
+      location
+      orderExpectedTime
+    }
+  }
+`;
+
 export const CHAT_CONTENT_LIST = gql`
   query chatContents($roomId: String!) {
     chatContents(roomId: $roomId) {
