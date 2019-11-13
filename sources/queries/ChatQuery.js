@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const NEW_ROOM = gql`
-  subscription subscriptChatRoom {
-    subscriptChatRoom {
+  subscription subscriptChatRoomCU {
+    subscriptChatRoomCU {
       id
       location
       latitude
@@ -18,6 +18,14 @@ export const NEW_ROOM = gql`
       memberList {
         id
       }
+    }
+  }
+`;
+
+export const DELETED_ROOM = gql`
+  subscription subscriptChatRoomD {
+    subscriptChatRoomD {
+      id
     }
   }
 `;

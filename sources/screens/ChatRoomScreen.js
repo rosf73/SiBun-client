@@ -47,7 +47,7 @@ function ChatRoomScreen(props) {
   var sum = 0;
   for(var i=0; i<getRoomOrder.individualOrderList.length; i++)
     for(var j=0; j<getRoomOrder.individualOrderList[i].menuList.length; j++)
-      sum += getRoomOrder.individualOrderList[i].menuList[j].price;
+      sum += getRoomOrder.individualOrderList[i].menuList[j].menu.price*getRoomOrder.individualOrderList[i].menuList[j].quantity;
   const removeChatRoomMutation = useMutation(REMOVE_CHAT_ROOM, {
     variables: {
       roomId: props.navigation.state.params.roomId
@@ -64,9 +64,7 @@ function ChatRoomScreen(props) {
       const { newChat } = data;
       setChatContentList(previous => [...previous, newChat]);
     }
-    return () => {
-      //this.flatListRef.scrollToEnd({ animated: true });
-    }
+    return () => {};
   }
   
   const handlePressBack = () => {
@@ -76,7 +74,6 @@ function ChatRoomScreen(props) {
 
   useEffect(() => {
     handleNewChats();
-    setTimeout(() => { /*this.flatListRef.scrollToEnd({ animated: true })*/ }, 100);
 
     BackHandler.addEventListener("hardwareBackPress", handlePressBack);
     return () => {
@@ -219,7 +216,9 @@ function ChatRoomScreen(props) {
       }
 
       <View style={styles.chat}>
-        <ScrollView>
+        <ScrollView
+          ref={(scroll) => this.scroll = scroll}
+          onContentSizeChange={() => this.scroll.scrollToEnd({ animated: true })}>
           {chatContentList.map(chat => 
             checkMe.id === chat.user.id ? 
             <MyChat user={chat.user.number} chatRoom={chat.chatRoom.id} content={chat.content}/>

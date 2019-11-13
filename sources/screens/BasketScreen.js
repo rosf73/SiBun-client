@@ -23,9 +23,22 @@ function BasketScreen(props) {
   }
   const handlePressParty = async () => {
     if(props.navigation.state.params.boss) { // 방을 만들 때
+      // 주문 시간이 얼마나 남았는지 검사
+      const newDate = new Date();
+      var now = newDate.getFullYear()+"-"+(newDate.getMonth()+1)+"-"+newDate.getDate()+"T";
+      if(newDate.getHours()<10)
+        now += "0"+newDate.getHours()+":"+newDate.getMinutes()+":00";
+      else
+        now += newDate.getHours()+":"+newDate.getMinutes()+":00";
+      if(Math.floor((new Date(props.navigation.state.params.time)-new Date(now))/1000/60) < 5) {
+        Alert.alert('', '방 만들기가 너무 지체되었습니다. 메인 화면으로 돌아갑니다', [{
+          text: '확인', onPress: () => props.navigation.popToTop()
+        }]);
+      }
+      
       try {
         setLoading(true);
-        const { data: { createChatRoom: { id } } } = await createChatRoomMutation({
+        const { data: { createChatRoom: { id } } } = await createChatRoomMutation({ // 방 생성
           variables: {
             storeName: props.navigation.state.params.storeName,
             time: props.navigation.state.params.time,
@@ -33,8 +46,8 @@ function BasketScreen(props) {
             additionalLocation: props.navigation.state.params.addLocation
           }
         });
-        const menuList = basket.map(item => { return { id: item.id } });
-        await addOrderMutation({
+        const menuList = basket.map(item => { return { id: item.id, quantity: item.quantity } });
+        await addOrderMutation({ // 내 주문 생성
           variables: {
             roomId: id,
             menuList
@@ -54,13 +67,13 @@ function BasketScreen(props) {
     else { // 방에 참여할 때
       try {
         setLoading(true);
-        const { data: { enterChatRoom: { id } } } = await enterChatRoomMutation({
+        const { data: { enterChatRoom: { id } } } = await enterChatRoomMutation({ // 방 입장
           variables: {
             chatId: props.navigation.state.params.roomId
           }
         });
-        const menuList = basket.map(item => { return { id: item.id } });
-        await addOrderMutation({
+        const menuList = basket.map(item => { return { id: item.id, quantity: item.quantity }  });
+        await addOrderMutation({ // 내 주문 생성
           variables: {
             roomId: id,
             menuList

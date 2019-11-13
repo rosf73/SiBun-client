@@ -12,7 +12,7 @@ import Room from '../components/Room'
 import CustomMarker from '../components/CustomMarker';
 import withSuspense from '../withSuspense';
 import { useInput } from '../hooks/useInput';
-import { GET_CHAT_ROOM_LIST, NEW_ROOM } from '../queries/ChatQuery';
+import { GET_CHAT_ROOM_LIST, NEW_ROOM, DELETED_ROOM } from '../queries/ChatQuery';
 import { FIND_MY_CHAT_LIST, CHECK_ME } from '../queries/UserQuery';
 
 
@@ -24,22 +24,26 @@ function MainScreen(props) {
   const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
   const searchInput = useInput("");
   const [ chatRooms, setChatRooms ] = useState(getChatRoomList || []);
-  const { data } = useSubscription(NEW_ROOM);
+  const { data: newData } = useSubscription(NEW_ROOM);
+  const { data: prevData } = useSubscription(DELETED_ROOM);
 
   const handleNewRooms = () => {
-    if(data !== undefined) {
-      const { subscriptChatRoom } = data;
-      setChatRooms(previous => [...previous, subscriptChatRoom]);
+    if(newData !== undefined) {
+      const { subscriptChatRoomCU } = newData;
+      setChatRooms(previous => [...previous, subscriptChatRoomCU]);
     }
-    return () => {
-      //this.flatListRef.scrollToEnd({ animated: true });
+    if(prevData !== undefined) {
+      const { subscriptChatRoomD: { id } } = prevData;
+      setChatRooms(previous => {
+        return previous.filter(item => item.id !== id);
+      });
     }
   }
 
   useEffect(() => {
     preLoad();
     handleNewRooms();
-  }, [data]);
+  }, [newData, prevData]);
 
   async function preLoad() {
     try {
@@ -145,8 +149,8 @@ function MainScreen(props) {
         region={{
           latitude: coordinate.latitude-0.001,
           longitude: coordinate.longitude,
-          latitudeDelta: 0.005, // 낮을 수록 줌이 크게 됨.
-          longitudeDelta: 0.005,
+          latitudeDelta: 0.0048, // 낮을 수록 줌이 크게 됨.
+          longitudeDelta: 0.0048,
         }}>
 
         <Marker
