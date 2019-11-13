@@ -5,7 +5,7 @@ class SearchScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>SearchScreen</Text>
+        <Text>지금은 이용할 수 없어요 ㅠㅠ</Text>
       </View>
     );
   }

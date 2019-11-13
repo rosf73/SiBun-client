@@ -8,7 +8,7 @@ import { getMainDefinition } from 'apollo-utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const httpLink = new HttpLink({
-  uri: 'http://18.225.35.109:8080', //59.151.215.3 //192.168.220.59
+  uri: 'http://18.225.35.109:8080', //59.151.215.3:4000 //192.168.220.59:4000 //18.225.35.109:8080
   credentials: 'same-origin'
 });
 

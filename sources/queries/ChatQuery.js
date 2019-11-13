@@ -102,8 +102,12 @@ export const GET_ROOM_ORDER = gql`
           number
         }
         menuList {
-          name
-          price
+          menu {
+            name
+            price
+          }
+          quantity
+          totalPrice
         }
       }
       state

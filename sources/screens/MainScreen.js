@@ -25,7 +25,6 @@ function MainScreen(props) {
   const searchInput = useInput("");
   const [ chatRooms, setChatRooms ] = useState(getChatRoomList || []);
   const { data } = useSubscription(NEW_ROOM);
-  var once = true;
 
   const handleNewRooms = () => {
     if(data !== undefined) {
@@ -38,10 +37,7 @@ function MainScreen(props) {
   }
 
   useEffect(() => {
-    if(once) {
-      preLoad();
-      once = false;
-    }
+    preLoad();
     handleNewRooms();
   }, [data]);
 

@@ -121,7 +121,7 @@ function ChatRoomScreen(props) {
       ]);
   }
   const handlePressEdit = () => {
-    alert('edit!');
+    alert('지금은 이용할 수 없어요 ㅠㅠ');
   }
   const handlePressFolder = () => {
     if(folding)
