@@ -23,9 +23,9 @@ class Order extends Component {
         <View style={{ marginLeft: 15 }}>
           <Text>{this.props.user}</Text>
         </View>
-        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+        <View style={{ flex: 1, alignItems: 'center' }}>
           {this.props.menus.map(menu => {
-            return <Text style={{ fontSize: 12 }}>{menu.menu.name}, </Text>
+            return <Text style={{ fontSize: 12 }}>{menu.menu.name} {menu.quantity}</Text>
           })}
         </View>
         <View style={{ marginRight: 15 }}>
@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
   container: {
     width: Dimensions.get("window").width,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10
   }
