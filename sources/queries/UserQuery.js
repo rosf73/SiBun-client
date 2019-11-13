@@ -33,6 +33,7 @@ export const FIND_MY_CHAT_LIST = gql`
         id
       }
       store {
+        name
         image
       }
       orderExpectedTime

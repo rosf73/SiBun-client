@@ -61,6 +61,7 @@ function MenuScreen(props) {
       else
         props.navigation.navigate("Basket", {
           roomId: props.navigation.state.params.roomId,
+          storeName: props.navigation.state.params.storeName,
           boss: props.navigation.state.params.boss,
           basket: list
         });

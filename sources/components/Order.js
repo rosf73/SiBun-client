@@ -2,10 +2,19 @@ import React, { Component } from 'react';
 import { View, StyleSheet, Text, Dimensions } from 'react-native';
 
 class Order extends Component {
-  componentWillMount() {
-    for(var i=0; i<this.props.menus.length; i++) {
-      
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      price: 0
     }
+  }
+
+  componentWillMount() {
+    var sum = 0;
+    for(var i=0; i<this.props.menus.length; i++)
+      sum += this.props.menus[i].menu.price*this.props.menus[i].quantity;
+    this.setState({ price: sum });
   }
 
   render() {
@@ -16,11 +25,11 @@ class Order extends Component {
         </View>
         <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
           {this.props.menus.map(menu => {
-            return <Text>{menu.name}</Text>
+            return <Text style={{ fontSize: 12 }}>{menu.menu.name}, </Text>
           })}
         </View>
         <View style={{ marginRight: 15 }}>
-          <Text>{this.props.user}</Text>
+          <Text>{this.state.price}</Text>
         </View>
       </View>
     );
@@ -29,11 +38,11 @@ class Order extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    height: 80,
     width: Dimensions.get("window").width,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    paddingVertical: 10
   }
 });
 

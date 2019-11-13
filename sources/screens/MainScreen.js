@@ -129,9 +129,9 @@ function MainScreen(props) {
             const onPress = () => {
               if(room.id) { // 방에 내가 참가한 상태인지
                 if(room.boss.id === checkMe.id)
-                  props.navigation.navigate("ChatRoom", { roomId: room.id, boss: true });
+                  props.navigation.navigate("ChatRoom", { roomId: room.id, storeName: room.store.name, boss: true });
                 else
-                  props.navigation.navigate("ChatRoom", { roomId: room.id, boss: false });
+                  props.navigation.navigate("ChatRoom", { roomId: room.id, storeName: room.store.name, boss: false });
                 return;
               }
               Alert.alert("이미 퇴장한 방입니다");
@@ -175,9 +175,9 @@ function MainScreen(props) {
             for(var i=0; i<memberList.length; i++)
               if(memberList[i]["id"] === checkMe.id) {
                 if(boss.id === checkMe.id)
-                  props.navigation.navigate("ChatRoom", { roomId: id, boss: true });
+                  props.navigation.navigate("ChatRoom", { roomId: id, storeName: store.name, boss: true });
                 else
-                  props.navigation.navigate("ChatRoom", { roomId: id, boss: false });
+                  props.navigation.navigate("ChatRoom", { roomId: id, storeName: store.name, boss: false });
                 return;
               }
             props.navigation.navigate("ParticipationNavigation", { roomId: id });

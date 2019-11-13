@@ -25,6 +25,11 @@ function ChatRoomScreen(props) {
       roomId: props.navigation.state.params.roomId
     }
   });
+  const { data } = useSubscription(NEW_CHAT, {
+    variables: {
+      roomId: props.navigation.state.params.roomId
+    }
+  });
   const [ chatContentList, setChatContentList ] = useState(chatContents || []);
   const sendChatMutation = useMutation(SEND_CHAT, {
     variables: {
@@ -32,11 +37,6 @@ function ChatRoomScreen(props) {
       content
     }
   })[0];
-  const { data } = useSubscription(NEW_CHAT, {
-    variables: {
-      roomId: props.navigation.state.params.roomId
-    }
-  });
   const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
   const { data: { getRoomOrder } } = useQuery(GET_ROOM_ORDER, {
     suspend: true,
@@ -64,7 +64,6 @@ function ChatRoomScreen(props) {
       const { newChat } = data;
       setChatContentList(previous => [...previous, newChat]);
     }
-    return () => {};
   }
   
   const handlePressBack = () => {
@@ -191,11 +190,13 @@ function ChatRoomScreen(props) {
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }}>
-            <ScrollView contentContainerStyle={styles.orderList}>
-              {getRoomOrder.individualOrderList.map(order => (
-                <Order key={order.id} user={order.user.number} menus={order.menuList}/>
-              ))}
-            </ScrollView>
+            <View style={styles.orderList}>
+              <ScrollView>
+                {getRoomOrder.individualOrderList.map(order => (
+                  <Order key={order.id} user={order.user.number} menus={order.menuList}/>
+                ))}
+              </ScrollView>
+            </View>
             <View style={styles.orderPrice}>
               <Text style={styles.orderPriceText}>총 주문액</Text>
               <Text style={{ fontSize: 18 }}>{sum}</Text>

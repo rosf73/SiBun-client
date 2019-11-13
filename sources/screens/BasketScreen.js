@@ -55,7 +55,11 @@ function BasketScreen(props) {
         });
         setLoading(false);
 
-        props.navigation.navigate("ChatRoom", { roomId: id, boss: props.navigation.state.params.boss });
+        props.navigation.navigate("ChatRoom", {
+          roomId: id, 
+          storeName: props.navigation.state.params.storeName,
+          boss: props.navigation.state.params.boss
+        });
       }
       catch(e) {
         Alert.alert("방 만들기에 실패했습니다");
@@ -87,7 +91,11 @@ function BasketScreen(props) {
         });
         setLoading(false);
         
-        props.navigation.navigate("ChatRoom", { roomId: id, boss: props.navigation.state.params.boss });
+        props.navigation.navigate("ChatRoom", {
+          roomId: id, 
+          storeName: props.navigation.state.params.storeName,
+          boss: props.navigation.state.params.boss
+        });
       }
       catch(e) {
         Alert.alert("방에 참여할 수 없습니다");
