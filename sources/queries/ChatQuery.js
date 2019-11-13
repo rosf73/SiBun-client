@@ -8,6 +8,14 @@ export const CREATE_CHAT_ROOM = gql`
   }
 `;
 
+export const REMOVE_CHAT_ROOM = gql`
+  mutation removeChatRoom($roomId: String!) {
+    removeChatRoom(roomId: $roomId) {
+      id
+    }
+  }
+`;
+
 export const GET_CHAT_ROOM_LIST = gql`
   query getChatRoomList {
     getChatRoomList {
@@ -20,6 +28,9 @@ export const GET_CHAT_ROOM_LIST = gql`
         image
       }
       orderExpectedTime
+      boss {
+        id
+      }
       memberList {
         id
       }

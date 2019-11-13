@@ -25,7 +25,8 @@ function BasketScreen(props) {
           variables: {
             storeName: props.navigation.state.params.storeName,
             time: props.navigation.state.params.time,
-            location: props.navigation.state.params.location
+            location: props.navigation.state.params.location,
+            boss: props.navigation.state.params.boss
           }
         });
         setLoading(false);
@@ -44,7 +45,8 @@ function BasketScreen(props) {
         setLoading(true);
         const { data: { enterChatRoom: { id } } } = await enterChatRoomMutation({
           variables: {
-            roomId: props.navigation.state.params.roomId
+            chatId: props.navigation.state.params.roomId,
+            boss: props.navigation.state.params.boss
           }
         });
         setLoading(false);

@@ -108,9 +108,16 @@ function MainScreen(props) {
         <ScrollView
           horizontal={true}
           showsHorizontalScrollIndicator={false}>
-          {findMyChatList.map(room => (
-            <Room key={room.id} uri={room.store.image} location={room.location}/>
-          ))}
+          {findMyChatList.map(room => {
+            const onPress = () => {
+              if(room.boss.id === checkMe.id)
+                props.navigation.navigate("ChatRoom", { roomId: id, boss: true });
+              else
+                props.navigation.navigate("ChatRoom", { roomId: id, boss: false });
+            }
+
+            return <Room key={room.id} uri={room.store.image} location={room.location} onPress={onPress}/>
+          })}
         </ScrollView>
       </View>
 
@@ -132,7 +139,7 @@ function MainScreen(props) {
           <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
         </Marker>
         {getChatRoomList.map((marker) => {
-          const { id, latitude, longitude, store, orderExpectedTime, memberList } = marker;
+          const { id, latitude, longitude, store, orderExpectedTime, boss, memberList } = marker;
           const newDate = new Date();
           var now = newDate.getFullYear()+"-"+(newDate.getMonth()+1)+"-"+newDate.getDate()+"T";
           if(newDate.getHours()<10)
@@ -145,7 +152,10 @@ function MainScreen(props) {
           const onPress = () => {
             for(var i=0; i<memberList.length; i++)
               if(memberList[i]["id"] === checkMe.id) {
-                props.navigation.navigate("ChatRoom", { roomId: id });
+                if(boss.id === checkMe.id)
+                  props.navigation.navigate("ChatRoom", { roomId: id, boss: true });
+                else
+                  props.navigation.navigate("ChatRoom", { roomId: id, boss: false });
                 return;
               }
             props.navigation.navigate("ParticipationNavigation", { roomId: id });

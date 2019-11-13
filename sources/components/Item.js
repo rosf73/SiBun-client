@@ -16,9 +16,9 @@ class Item extends Component {
 const styles = StyleSheet.create({
   container: {
     height: 110,
-    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFF',
     borderBottomColor: '#CCC',
     borderBottomWidth: 1

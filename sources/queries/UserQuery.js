@@ -26,6 +26,9 @@ export const FIND_MY_CHAT_LIST = gql`
   query findMyChatList {
     findMyChatList {
       id
+      boss {
+        id
+      }
       store {
         image
       }

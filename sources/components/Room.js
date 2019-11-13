@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 
 class Room extends Component {
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.marker}>
-          <Image style={styles.image} source={{ uri: this.props.uri }}/>
-        </View>
-        <Text style={{ fontSize: 10 }}>{this.props.location}</Text>
+      <View>
+        <TouchableOpacity
+          style={styles.container}
+          onPress={this.props.onPress}>
+          <View style={styles.marker}>
+            <Image style={styles.image} source={{ uri: this.props.uri }}/>
+          </View>
+          <Text style={{ fontSize: 10 }}>{this.props.location}</Text>
+        </TouchableOpacity>
       </View>
     );
   }

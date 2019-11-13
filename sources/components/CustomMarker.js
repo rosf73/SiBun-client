@@ -8,7 +8,7 @@ class CustomMarker extends Component {
       <View style={styles.container}>
   
         <View style={styles.description}>
-          <Text style={styles.text}>{this.props.time} </Text>
+          <Text style={styles.text}>{this.props.time}분 </Text>
           <Ionicon name="ios-alarm" size={25} color="#F00"/>
           <Text style={styles.text}>  {this.props.member} </Text>
           <Image style={styles.icon} source={require('../../resources/images/me.png')}/>
