@@ -71,13 +71,13 @@ function LoginScreen({ func }) {
         {...numberInput}
         style={styles.textInput}
         placeholder="학번"
-        placeholderTextColor="#FFFFFF"/>
+        placeholderTextColor="#FFF"/>
       <TextInput
         {...pwdInput}
         style={styles.textInput}
         secureTextEntry={true}
         placeholder="비밀번호"
-        placeholderTextColor="#FFFFFF"/>
+        placeholderTextColor="#FFF"/>
 
       <TouchableOpacity
         style={styles.button}

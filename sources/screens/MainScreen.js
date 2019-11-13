@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, TextInput, PermissionsAndroid, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
-import { useMutation, useQuery } from 'react-apollo-hooks';
+import { useQuery, useSubscription } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -12,7 +12,7 @@ import Room from '../components/Room'
 import CustomMarker from '../components/CustomMarker';
 import withSuspense from '../withSuspense';
 import { useInput } from '../hooks/useInput';
-import { GET_CHAT_ROOM_LIST } from '../queries/ChatQuery';
+import { GET_CHAT_ROOM_LIST, NEW_ROOM } from '../queries/ChatQuery';
 import { FIND_MY_CHAT_LIST, CHECK_ME } from '../queries/UserQuery';
 
 
@@ -23,10 +23,27 @@ function MainScreen(props) {
   const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
   const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
   const searchInput = useInput("");
+  const [ chatRooms, setChatRooms ] = useState(getChatRoomList || []);
+  const { data } = useSubscription(NEW_ROOM);
+  var once = true;
+
+  const handleNewRooms = () => {
+    if(data !== undefined) {
+      const { subscriptChatRoom } = data;
+      setChatRooms(previous => [...previous, subscriptChatRoom]);
+    }
+    return () => {
+      //this.flatListRef.scrollToEnd({ animated: true });
+    }
+  }
 
   useEffect(() => {
-    preLoad();
-  }, []);
+    if(once) {
+      preLoad();
+      once = false;
+    }
+    handleNewRooms();
+  }, [data]);
 
   async function preLoad() {
     try {
@@ -110,13 +127,18 @@ function MainScreen(props) {
           showsHorizontalScrollIndicator={false}>
           {findMyChatList.map(room => {
             const onPress = () => {
-              if(room.boss.id === checkMe.id)
-                props.navigation.navigate("ChatRoom", { roomId: id, boss: true });
-              else
-                props.navigation.navigate("ChatRoom", { roomId: id, boss: false });
+              if(room.id) { // 방에 내가 참가한 상태인지
+                if(room.boss.id === checkMe.id)
+                  props.navigation.navigate("ChatRoom", { roomId: room.id, boss: true });
+                else
+                  props.navigation.navigate("ChatRoom", { roomId: room.id, boss: false });
+                return;
+              }
+              Alert.alert("이미 퇴장한 방입니다");
+              props.navigation.navigate("Main");
             }
 
-            return <Room key={room.id} uri={room.store.image} location={room.location} onPress={onPress}/>
+            return <Room key={room.id} uri={room.store.image} location={room.additionalLocation} onPress={onPress}/>
           })}
         </ScrollView>
       </View>
@@ -138,7 +160,7 @@ function MainScreen(props) {
           }}>
           <Image style={styles.me} source={require('../../resources/images/MyPosition.png')}/>
         </Marker>
-        {getChatRoomList.map((marker) => {
+        {chatRooms.map((marker) => {
           const { id, latitude, longitude, store, orderExpectedTime, boss, memberList } = marker;
           const newDate = new Date();
           var now = newDate.getFullYear()+"-"+(newDate.getMonth()+1)+"-"+newDate.getDate()+"T";

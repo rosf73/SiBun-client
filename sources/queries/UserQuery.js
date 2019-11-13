@@ -29,11 +29,14 @@ export const FIND_MY_CHAT_LIST = gql`
       boss {
         id
       }
+      memberList {
+        id
+      }
       store {
         image
       }
       orderExpectedTime
-      location
+      additionalLocation
     }
   }
 `;

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 15
+    marginHorizontal: 20
   },
   marker: {
     borderRadius: 100,

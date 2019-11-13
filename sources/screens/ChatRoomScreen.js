@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput, BackHandler } from 'react-native';
 import { useQuery, useMutation, useSubscription } from 'react-apollo-hooks';
 import { withNavigation } from 'react-navigation';
 import Entypo from 'react-native-vector-icons/Entypo'
@@ -43,7 +43,11 @@ function ChatRoomScreen(props) {
     variables: {
       roomId: props.navigation.state.params.roomId
     }
-  })
+  });
+  var sum = 0;
+  for(var i=0; i<getRoomOrder.individualOrderList.length; i++)
+    for(var j=0; j<getRoomOrder.individualOrderList[i].menuList.length; j++)
+      sum += getRoomOrder.individualOrderList[i].menuList[j].price;
   const removeChatRoomMutation = useMutation(REMOVE_CHAT_ROOM, {
     variables: {
       roomId: props.navigation.state.params.roomId
@@ -64,12 +68,22 @@ function ChatRoomScreen(props) {
       //this.flatListRef.scrollToEnd({ animated: true });
     }
   }
+  
+  const handlePressBack = () => {
+    props.navigation.popToTop();
+    return true;
+  }
 
   useEffect(() => {
     handleNewChats();
     setTimeout(() => { /*this.flatListRef.scrollToEnd({ animated: true })*/ }, 100);
-  }, [data])
-  
+
+    BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handlePressBack)
+    }
+  }, [data]);
+
   const handlePressExit = () => {
     if(props.navigation.state.params.boss)
       Alert.alert('', '정말로 이 채팅방을 삭제하시겠습니까?', [
@@ -82,12 +96,8 @@ function ChatRoomScreen(props) {
   
               props.navigation.navigate("Main");
             }
-            catch(e) {
-              Alert.alert("방을 삭제할 수 없습니다");
-            }
-            finally {
-              setLoading(false);
-            }
+            catch(e) { Alert.alert("방을 삭제할 수 없습니다"); }
+            finally { setLoading(false); }
           }
         },
         { text: '취소', onPress: () => { } }
@@ -103,12 +113,8 @@ function ChatRoomScreen(props) {
 
               props.navigation.navigate("Main");
             }
-            catch(e) {
-              Alert.alert("퇴장할 수 없습니다");
-            }
-            finally {
-              setLoading(false);
-            }
+            catch(e) { Alert.alert("퇴장할 수 없습니다"); }
+            finally { setLoading(false); }
           }
         },
         { text: '취소', onPress: () => { } }
@@ -122,6 +128,9 @@ function ChatRoomScreen(props) {
       setFolding(false);
     else
       setFolding(true);
+  }
+  const handlePressOrder = () => {
+    props.navigation.navigate("Order");
   }
   const handlePressSend = async () => {
     try {
@@ -155,7 +164,7 @@ function ChatRoomScreen(props) {
             <Text style={styles.buttonText}>나가기</Text>
           }
         </TouchableOpacity>
-        <Text style={styles.store}>BHC 옥계행복점</Text>
+        <Text style={styles.store}>{props.navigation.state.params.storeName}</Text>
         <TouchableOpacity
           style={{ marginRight: 10 }}
           onPress={handlePressEdit}>
@@ -163,31 +172,51 @@ function ChatRoomScreen(props) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.order}>
-        <View style={styles.orderHeader}>
-          <Text style={styles.orderTitle}>주문 현황</Text>
-          <TouchableOpacity
-            style={{ marginRight: 20 }}
-            onPress={handlePressFolder}>
-            <FontAwesome name="angle-double-up" size={30} color="#AAA"/>
-          </TouchableOpacity>
+      {folding ?
+        <View style={styles.foldOrder}>
+          <View style={styles.orderHeader}>
+            <Text style={styles.orderTitle}>주문 현황</Text>
+            <TouchableOpacity
+              style={{ marginRight: 20 }}
+              onPress={handlePressFolder}>
+              <FontAwesome name="angle-double-down" size={30} color="#AAA"/>
+            </TouchableOpacity>
+          </View>
         </View>
-        <ScrollView contentContainerStyle={styles.orderList}>
-          {getRoomOrder.individualOrderList.map(order => (
-            <Order key={order.id} user={order.individualOrderList.user} menus={order.individualOrderList.menuList}/>
-          ))}
-        </ScrollView>
-        <View style={styles.orderPrice}>
-          <Text style={styles.orderPriceText}>총 주문액</Text>
+        :
+        <View style={styles.order}>
+          <View style={styles.orderHeader}>
+            <Text style={styles.orderTitle}>주문 현황</Text>
+            <TouchableOpacity
+              style={{ marginRight: 20 }}
+              onPress={handlePressFolder}>
+              <FontAwesome name="angle-double-up" size={30} color="#AAA"/>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={styles.orderList}>
+              {getRoomOrder.individualOrderList.map(order => (
+                <Order key={order.id} user={order.user.number} menus={order.menuList}/>
+              ))}
+            </ScrollView>
+            <View style={styles.orderPrice}>
+              <Text style={styles.orderPriceText}>총 주문액</Text>
+              <Text style={{ fontSize: 18 }}>{sum}</Text>
+            </View>
+            {props.navigation.state.params.boss ?
+              <View style={styles.orderFooter}>
+                <TouchableOpacity
+                  style={styles.ordering}
+                  onPress={handlePressOrder}>
+                  <Text style={styles.buttonText}>주문하기</Text>
+                </TouchableOpacity>
+              </View>
+              :
+              null
+            }
+          </View>
         </View>
-        <View style={styles.orderFooter}>
-          <TouchableOpacity
-            style={styles.ordering}
-            onPress={handlePressFolder}>
-            <Text style={styles.buttonText}>주문하기</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      }
 
       <View style={styles.chat}>
         <ScrollView>
@@ -244,9 +273,12 @@ const styles = StyleSheet.create({
   store: {
     color: '#666'
   },
+  foldOrder: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#CCC'
+  },
   order: {
     height: 250,
-    backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderBottomColor: '#CCC'
   },
@@ -267,7 +299,8 @@ const styles = StyleSheet.create({
   orderPrice: {
     height: 40,
     flexDirection: 'row',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    marginRight: 20
   },
   orderPriceText: {
     marginRight: 20

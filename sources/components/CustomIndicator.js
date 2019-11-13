@@ -8,35 +8,24 @@ function CustomIndicator(props) {
       animationType={'none'}
       visible={props.isLoading}
       onRequestClose={() => {console.log('Close modal')}}>
-      <View style={styles.modalBackground}>
-        <View style={styles.activityIndicatorWrapper}>
-          <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
-          <ActivityIndicator/>
-        </View>
+      <View style={styles.container}>
+        <Image style={styles.logo} source={require("../../resources/images/logo.png")}/>
+        <ActivityIndicator/>
       </View>
     </Modal>
   )
 }
 
 const styles = StyleSheet.create({
-  modalBackground: {
+  container: {
     flex: 1,
     alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     backgroundColor: '#00000040'
   },
-  activityIndicatorWrapper: {
+  logo: {
     height: 100,
     width: 100,
-    borderRadius: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-around'
-  },
-  logo: {
-    height: 200,
-    width: 200,
     resizeMode: 'contain',
     marginBottom: 25
   }

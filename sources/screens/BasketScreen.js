@@ -3,16 +3,20 @@ import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Text, Alert } fr
 import { withNavigation } from 'react-navigation';
 import { useMutation } from 'react-apollo-hooks';
 
+import CustomIndicator from '../components/CustomIndicator';
 import withSuspense from '../withSuspense';
 import Item from '../components/Item';
-import { CREATE_CHAT_ROOM } from '../queries/ChatQuery';
+import { CREATE_CHAT_ROOM, SEND_CHAT } from '../queries/ChatQuery';
 import { ENTER_CHAT_ROOM } from '../queries/UserQuery';
-import CustomIndicator from '../components/CustomIndicator';
+import { ADD_ORDER } from '../queries/OrderQuery';
 
 function BasketScreen(props) {
   const [ loading, setLoading ] = useState(false);
   const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM)[0];
   const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM)[0];
+  const addOrderMutation = useMutation(ADD_ORDER)[0];
+  const { basket } = props.navigation.state.params;
+  const sendChatMutation = useMutation(SEND_CHAT)[0];
 
   const handlePressBack = () => {
     props.navigation.goBack();
@@ -26,12 +30,19 @@ function BasketScreen(props) {
             storeName: props.navigation.state.params.storeName,
             time: props.navigation.state.params.time,
             location: props.navigation.state.params.location,
-            boss: props.navigation.state.params.boss
+            additionalLocation: props.navigation.state.params.addLocation
+          }
+        });
+        const menuList = basket.map(item => { return { id: item.id } });
+        await addOrderMutation({
+          variables: {
+            roomId: id,
+            menuList
           }
         });
         setLoading(false);
 
-        props.navigation.navigate("ChatRoom", { roomId: id });
+        props.navigation.navigate("ChatRoom", { roomId: id, boss: props.navigation.state.params.boss });
       }
       catch(e) {
         Alert.alert("방 만들기에 실패했습니다");
@@ -45,13 +56,25 @@ function BasketScreen(props) {
         setLoading(true);
         const { data: { enterChatRoom: { id } } } = await enterChatRoomMutation({
           variables: {
-            chatId: props.navigation.state.params.roomId,
-            boss: props.navigation.state.params.boss
+            chatId: props.navigation.state.params.roomId
+          }
+        });
+        const menuList = basket.map(item => { return { id: item.id } });
+        await addOrderMutation({
+          variables: {
+            roomId: id,
+            menuList
+          }
+        });
+        await sendChatMutation({
+          variables: {
+            roomId: id,
+            content: "반가워요! 방금 들어왔습니다 :)"
           }
         });
         setLoading(false);
         
-        props.navigation.navigate("ChatRoom", { roomId: id });
+        props.navigation.navigate("ChatRoom", { roomId: id, boss: props.navigation.state.params.boss });
       }
       catch(e) {
         Alert.alert("방에 참여할 수 없습니다");
@@ -76,13 +99,13 @@ function BasketScreen(props) {
       </View>
 
       <View style={styles.property}>
-        <Text style={{ flex: 1 }}>이름</Text>
+        <Text style={{ flex: 1, textAlign: 'center' }}>이름</Text>
         <Text style={{ padding: 10 }}>수량</Text>
         <Text style={{ padding: 10 }}>가격</Text>
       </View>
       <ScrollView>
         {props.navigation.state.params.basket.map((item, index) => (
-          <Item key={index} name={item.name} quantity={item.quantity} price={item.price}/>
+          <Item key={index} name={item.name} quantity={item.quantity} price={item.totalPrice}/>
         ))}
       </ScrollView>
       

@@ -19,3 +19,11 @@ export const GET_MENU_LIST = gql`
     }
   }
 `;
+
+export const ADD_ORDER = gql`
+  mutation addIndividualOrder($roomId: String! $menuList: [MenuInput]) {
+    addIndividualOrder(roomId: $roomId menuList: $menuList) {
+      id
+    }
+  }
+`;

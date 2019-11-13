@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Dimensions } from 'react-native';
 
 class Item extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{ flex: 1 }}>{this.props.name}</Text>
-        <Text style={{ padding: 10 }}>{this.props.quantity}</Text>
-        <Text style={{ padding: 10 }}>{this.props.price}</Text>
+        <View style={{ flex: 1, marginLeft: 15 }}>
+          <Text style={{ textAlign: 'center' }}>{this.props.name}</Text>
+        </View>
+        <View style={{ padding: 10 }}>
+          <Text>{this.props.quantity}</Text>
+        </View>
+        <View style={{ padding: 10 }}>
+          <Text>{this.props.price}</Text>
+        </View>
       </View>
     );
   }
@@ -15,11 +21,11 @@ class Item extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    height: 110,
+    height: 80,
+    width: Dimensions.get("window").width,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF',
+    justifyContent: 'space-between',
     borderBottomColor: '#CCC',
     borderBottomWidth: 1
   }

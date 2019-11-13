@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
 
 class Menu extends Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class Menu extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View>
+        <View style={{ marginLeft: 15 }}>
           <Text>{this.props.name}</Text>
           <Text>{this.props.price}</Text>
         </View>
@@ -45,16 +45,17 @@ class Menu extends Component {
 const styles = StyleSheet.create({
   container: {
     height: 110,
-    width: '100%',
+    width: Dimensions.get("window").width,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     backgroundColor: '#FFF',
     borderBottomColor: '#CCC',
     borderBottomWidth: 1
   },
   right: {
     flexDirection: 'row',
+    marginRight: 15
   },
   button: {
     width: 25,

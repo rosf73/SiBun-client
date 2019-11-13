@@ -5,7 +5,7 @@ import { withNavigation } from 'react-navigation';
 import Category from '../components/Category';
 
 function ChooseCategoryScreen(props) {
-  const categoryList = [
+  const categoryList1 = [
     {
       id: 0,
       category: "치킨",
@@ -18,10 +18,28 @@ function ChooseCategoryScreen(props) {
     },
     {
       id: 2,
-      category: "음료",
-      uri: "https://previews.123rf.com/images/andegro4ka/andegro4ka1611/andegro4ka161100005/68691496-%ED%9D%B0%EC%83%89-%EC%82%AC%EC%8B%A4%EC%A0%81%EC%9D%B8-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4%EC%85%98%EC%97%90-%EA%B3%A0%EB%A6%BD-%EB%90%9C-%EC%95%84%EC%9D%B4%EC%8A%A4-%EC%BB%A4%ED%94%BC.jpg"
+      category: "패스트푸드",
+      uri: "https://data.ac-illust.com/data/thumbnails/ac/ace5f3affd8956d7dcec08e3ec28208c_t.jpeg"
     },
-  ]
+  ];
+  
+  const categoryList2 = [
+    {
+      id: 0,
+      category: "돈까스",
+      uri: "https://en.pimg.jp/032/875/502/1/32875502.jpg"
+    },
+    {
+      id: 1,
+      category: "일식",
+      uri: "https://en.pimg.jp/030/854/595/1/30854595.jpg"
+    },
+    {
+      id: 2,
+      category: "족발",
+      uri: "https://t4.ftcdn.net/jpg/01/04/89/63/240_F_104896383_HO0RkTAVtLJxWmvcrp06AzDe5OtmQHgX.jpg"
+    },
+  ];
 
   const handlePressBack = () => {
     props.navigation.goBack(null);
@@ -42,11 +60,20 @@ function ChooseCategoryScreen(props) {
       <Text style={styles.store}>어떤 종류를 원하세요?</Text>
       
       <View style={styles.client}>
-        {categoryList.map(item => {
-          const handlePress = () => { props.navigation.navigate("ChooseStore", { category: item.category }); }
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          {categoryList1.map(item => {
+            const handlePress = () => { props.navigation.navigate("ChooseStore", { category: item.category }); }
 
-          return <Category key={item.id} category={item.category} uri={item.uri} onPress={handlePress}/>;
-        })}
+            return <Category key={item.id} category={item.category} uri={item.uri} onPress={handlePress}/>;
+          })}
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          {categoryList2.map(item => {
+            const handlePress = () => { props.navigation.navigate("ChooseStore", { category: item.category }); }
+
+            return <Category key={item.id} category={item.category} uri={item.uri} onPress={handlePress}/>;
+          })}
+        </View>
       </View>
 
     </View>
@@ -75,7 +102,6 @@ const styles = StyleSheet.create({
   },
   client: {
     flex: 1,
-    flexDirection: 'row',
     justifyContent: 'center'
   }
 });

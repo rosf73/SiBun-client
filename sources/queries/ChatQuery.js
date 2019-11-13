@@ -1,8 +1,30 @@
 import gql from 'graphql-tag';
 
+export const NEW_ROOM = gql`
+  subscription subscriptChatRoom {
+    subscriptChatRoom {
+      id
+      location
+      latitude
+      longitude
+      store {
+        name
+        image
+      }
+      orderExpectedTime
+      boss {
+        id
+      }
+      memberList {
+        id
+      }
+    }
+  }
+`;
+
 export const CREATE_CHAT_ROOM = gql`
-  mutation createChatRoom($storeName: String! $location: String! $time: DateTime!) {
-    createChatRoom(storeName: $storeName location: $location time: $time) {
+  mutation createChatRoom($storeName: String! $location: String! $time: DateTime! $additionalLocation : String!) {
+    createChatRoom(storeName: $storeName location: $location time: $time additionalLocation: $additionalLocation) {
       id
     }
   }
@@ -77,7 +99,7 @@ export const GET_ROOM_ORDER = gql`
       individualOrderList {
         id
         user {
-          id
+          number
         }
         menuList {
           name

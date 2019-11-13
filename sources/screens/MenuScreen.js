@@ -54,11 +54,14 @@ function MenuScreen(props) {
           storeName: props.navigation.state.params.storeName,
           time: props.navigation.state.params.time,
           location: props.navigation.state.params.location,
+          addLocation: props.navigation.state.params.addLocation,
+          boss: props.navigation.state.params.boss,
           basket: list
         });
       else
         props.navigation.navigate("Basket", {
           roomId: props.navigation.state.params.roomId,
+          boss: props.navigation.state.params.boss,
           basket: list
         });
     }
@@ -82,14 +85,14 @@ function MenuScreen(props) {
           basket.push(menu);
           const onPlus = () => {
             const list = basket.map(item => {
-              if(item.name === menu.name) return { ...item, quantity: item.quantity+1 };
+              if(item.name === menu.name) return { ...item, quantity: item.quantity+1, totalPrice: item.price*(item.quantity+1) };
               else return { ...item };
             });
             basket = list;
           };
           const onMinus = () => {
             const list = basket.map(item => {
-              if(item.name === menu.name) return { ...item, quantity: item.quantity-1 };
+              if(item.name === menu.name) return { ...item, quantity: item.quantity-1, totalPrice: item.price*(item.quantity-1) };
               else return { ...item };
             });
             basket = list;

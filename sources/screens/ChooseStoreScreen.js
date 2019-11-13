@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
   },
   client: {
     flex: 1,
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'center'
   }

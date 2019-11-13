@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Picker, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Picker, Alert, TextInput } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+//import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+
+import { useInput } from '../hooks/useInput';
 
 function InputOrderInfoScreen(props) {
-  const [ location, setLocation ] = useState("");
+  const [ location, setLocation ] = useState("주소지 선택");
   const [ time, setTime ] = useState({ hour: 0, min: 0 });
   var minList = [];
   for(var i=0; i<60; i++) {
@@ -13,20 +15,31 @@ function InputOrderInfoScreen(props) {
     else
       minList.push(String(i));
   }
+  const locationInput = useInput("");
 
   useEffect(() => {
     initTime();
   }, []);
 
   const initTime = () => {
-    if(new Date().getMinutes() < 50)
+    if(new Date().getMinutes() < 50 && new Date().getHours() >= 10)
       setTime({
         hour: new Date().getHours(),
-        min: (new Date().getMinutes()+10)
+        min: new Date().getMinutes()+10
+      });
+    else if(new Date().getMinutes() < 50 && new Date().getHours() < 10)
+      setTime({
+        hour: "0"+new Date().getHours(),
+        min: new Date().getMinutes()+10
+      });
+    else if(new Date().getMinutes() >= 50 && new Date().getHours()+1 >= 10)
+      setTime({
+        hour: (new Date().getHours()+1)%24,
+        min: "0"+(new Date().getMinutes()+10)
       });
     else
       setTime({
-        hour: (new Date().getHours()+1)%24,
+        hour: "0"+((new Date().getHours()+1)%24),
         min: "0"+(new Date().getMinutes()-50)
       });
   }
@@ -35,8 +48,10 @@ function InputOrderInfoScreen(props) {
     return true;
   };
   const handlePressConfirm = () => {
-    if(location === "")
+    if(location === "주소지 선택")
       Alert.alert("주소지를 선택해주세요");
+    else if(locationInput.value === "")
+      Alert.alert("추가 주소지를 입력해주세요");
     else if((new Date().getHours() < time.hour && new Date().getMinutes() < time.min)
          || (new Date().getHours() == time.hour && new Date().getMinutes()+10 > time.min)) {
       Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
@@ -47,9 +62,13 @@ function InputOrderInfoScreen(props) {
         storeName: props.navigation.state.params.store,
         time: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+"T"+time.hour+":"+time.min,
         location,
+        addLocation: locationInput.value,
         boss: true
       });
     }
+  }
+  const handleChangeLocation = (itemValue, itemPosition) => {
+    setLocation(itemValue);
   }
   const handleChangeHours = (itemValue, itemPosition) => {
     setTime({ hour: itemValue, min: time.min });
@@ -72,44 +91,26 @@ function InputOrderInfoScreen(props) {
       <Text style={styles.description}>배달지를 선택해주세요</Text>
       
       <View style={styles.client}>
-        <GooglePlacesAutocomplete
-          placeholder='주소지 입력'
-          minLength={2}
-          autoFocus={false}
-          returnKeyType={'default'}
-          fetchDetails={true}
-          onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-            setLocation(data.description);
-          }}
-          query={{
-            key: 'AIzaSyDbd8LzMXuc_A3Bkqznl9EjwF-HaQZ-v4w',
-            language: 'ko',
-            types: '',
-          }}
-          styles={{
-            container: {
-              flex: 0,
-              width: '90%',
-              height: 200,
-              alignSelf: 'center'
-            },
-            textInputContainer: {
-              backgroundColor: '#FFF',
-              borderTopWidth: 0,
-              borderBottomWidth: 0
-            },
-            textInput: {
-              height: 40,
-              color: '#AAA',
-              fontSize: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: '#CCC'
-            },
-            predefinedPlacesDescription: {
-              color: '#1faadb'
-            },
-          }}
-          nearbyPlacesAPI="GooglePlacesSearch"/>
+        <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
+          <Text style={{ fontSize: 18 }}>{location}</Text>
+          <Picker
+            selectedValue={location}
+            style={{ width: 50, height: 50 }}
+            onValueChange={handleChangeLocation}>
+            <Picker.Item label="금오공과대학교 기숙사" value="금오공과대학교 기숙사"/>
+            <Picker.Item label="금오공과대학교 테크노관" value="금오공과대학교 테크노관"/>
+            <Picker.Item label="금오공과대학교 디지털관" value="금오공과대학교 디지털관"/>
+            <Picker.Item label="금오공과대학교 글로벌관" value="금오공과대학교 글로벌관"/>
+            <Picker.Item label="금오공과대학교 학생회관" value="금오공과대학교 학생회관"/>
+          </Picker>
+        </View>
+        <View style={styles.input}>
+          <TextInput
+            style={{ color: '#666', fontSize: 16 }}
+            {...locationInput}
+            placeholder="추가 주소지 입력"
+            placeholderTextColor="#CCC"/>
+        </View>
         <Text style={styles.description}>예상 주문 시간을 선택해 주세요</Text>
         <View style={styles.time}>
           <Text>{time.hour}</Text>
@@ -169,6 +170,13 @@ const styles = StyleSheet.create({
   client: {
     flex: 1
   },
+  input: {
+    width: '80%',
+    borderBottomColor: '#CCC',
+    borderBottomWidth: 1,
+    alignSelf: 'center',
+    marginBottom: 30
+  },
   time: {
     flexDirection: 'row',
     paddingLeft: 35
@@ -183,3 +191,42 @@ const styles = StyleSheet.create({
 });
 
 export default withNavigation(InputOrderInfoScreen);
+
+/* <GooglePlacesAutocomplete
+  placeholder='주소지 입력'
+  minLength={2}
+  autoFocus={false}
+  returnKeyType={'default'}
+  fetchDetails={true}
+  onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+    setLocation(data.description);
+  }}
+  query={{
+    key: 'AIzaSyDbd8LzMXuc_A3Bkqznl9EjwF-HaQZ-v4w',
+    language: 'ko',
+    types: '',
+  }}
+  styles={{
+    container: {
+      flex: 0,
+      width: '90%',
+      height: 200,
+      alignSelf: 'center'
+    },
+    textInputContainer: {
+      backgroundColor: '#FFF',
+      borderTopWidth: 0,
+      borderBottomWidth: 0
+    },
+    textInput: {
+      height: 40,
+      color: '#666',
+      fontSize: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: '#CCC'
+    },
+    predefinedPlacesDescription: {
+      color: '#1faadb'
+    },
+  }}
+  nearbyPlacesAPI="GooglePlacesSearch"/> */
