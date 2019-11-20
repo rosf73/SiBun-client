@@ -52,3 +52,19 @@ export const CHECK_ME = gql`
     }
   }
 `;
+
+export const GET_SAME_CATEGORY = gql`
+  query getStoreCategoryChatRoomList($storeCategoryName: String!){
+    getStoreCategoryChatRoomList(storeCategoryName: $storeCategoryName){
+    id
+    store{
+      image
+      name
+    }
+    location
+    memberList{
+      number
+    }
+  }
+}
+`;
