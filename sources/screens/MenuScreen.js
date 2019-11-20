@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Text, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { useQuery } from 'react-apollo-hooks';
@@ -10,7 +10,7 @@ import Menu from '../components/Menu';
 
 function MenuScreen(props) {
   var basket = [];
-  const { data: { getStoreMenu }} = useQuery(GET_MENU_LIST, {
+  const { data: { getStoreMenu } } = useQuery(GET_MENU_LIST, {
     suspend: true,
     variables: {
       storeName: props.navigation.state.params.storeName

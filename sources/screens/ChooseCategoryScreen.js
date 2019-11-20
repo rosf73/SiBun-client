@@ -13,8 +13,8 @@ function ChooseCategoryScreen(props) {
     },
     {
       id: 1,
-      category: "중식",
-      uri: "https://media.istockphoto.com/vectors/dim-sum-chinese-food-with-chopstick-vector-illustration-vector-id960662096"
+      category: "분식",
+      uri: "http://www.urbanbrush.net/web/wp-content/uploads/edd/2017/10/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7-2017-10-19-%EC%98%A4%EC%A0%84-12.28.00.png"
     },
     {
       id: 2,

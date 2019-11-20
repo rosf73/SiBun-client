@@ -19,7 +19,7 @@ function ChatRoomScreen(props) {
   const [ loading, setLoading ] = useState(false);
   const [ folding, setFolding ] = useState(false);
   const [ content, setContent ] = useState("");
-  const { data: { chatContents } } = useQuery(CHAT_CONTENT_LIST, {
+  const { data: { chatContents }, loading: contentLoading, refetch: contentsRef } = useQuery(CHAT_CONTENT_LIST, {
     suspend: true,
     variables: {
       roomId: props.navigation.state.params.roomId
@@ -38,7 +38,7 @@ function ChatRoomScreen(props) {
     }
   })[0];
   const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
-  const { data: { getRoomOrder } } = useQuery(GET_ROOM_ORDER, {
+  const { data: { getRoomOrder }, loading: orderLoading, refetch: ordersRef } = useQuery(GET_ROOM_ORDER, {
     suspend: true,
     variables: {
       roomId: props.navigation.state.params.roomId
@@ -74,9 +74,19 @@ function ChatRoomScreen(props) {
   useEffect(() => {
     handleNewChats();
 
+    contentsRef({ variables: { roomId: props.navigation.state.params.roomId } });
+    ordersRef({ variables: { roomId: props.navigation.state.params.roomId } });
+    const focusSubscription = props.navigation.addListener(
+      'didFocus',
+      () => {
+        contentsRef({ variables: { roomId: props.navigation.state.params.roomId } });
+        ordersRef({ variables: { roomId: props.navigation.state.params.roomId } });
+      }
+    );
     BackHandler.addEventListener("hardwareBackPress", handlePressBack);
     return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handlePressBack)
+      focusSubscription.remove();
+      BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
     }
   }, [data]);
 
@@ -148,7 +158,7 @@ function ChatRoomScreen(props) {
 
   return (
     <View style={styles.container}>
-      <CustomIndicator isLoading={loading}/>
+      <CustomIndicator isLoading={loading || contentLoading || orderLoading}/>
       
       <View style={styles.header}>
         <TouchableOpacity

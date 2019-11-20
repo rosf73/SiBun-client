@@ -9,7 +9,7 @@ import { useInput, useNumInput } from '../hooks/useInput';
 
 function LoginScreen({ func }) {
   const [ loading, setLoading ] = useState(false);
-  const numberInput = useNumInput("");
+  const numberInput = useNumInput("0");
   const pwdInput = useInput("");
   const signInMutation = useMutation(SIGN_IN, {
     variables: {

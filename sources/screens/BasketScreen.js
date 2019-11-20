@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Image, Text, Alert } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { useMutation } from 'react-apollo-hooks';
@@ -15,8 +15,9 @@ function BasketScreen(props) {
   const createChatRoomMutation = useMutation(CREATE_CHAT_ROOM)[0];
   const enterChatRoomMutation = useMutation(ENTER_CHAT_ROOM)[0];
   const addOrderMutation = useMutation(ADD_ORDER)[0];
-  const { basket } = props.navigation.state.params;
   const sendChatMutation = useMutation(SEND_CHAT)[0];
+  
+  const { basket } = props.navigation.state.params;
 
   const handlePressBack = () => {
     props.navigation.goBack();

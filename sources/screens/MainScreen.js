@@ -8,6 +8,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
+import CustomIndicator from '../components/CustomIndicator';
 import Room from '../components/Room'
 import CustomMarker from '../components/CustomMarker';
 import withSuspense from '../withSuspense';
@@ -20,8 +21,8 @@ function MainScreen(props) {
   const [ coordinate, setCoordinate ] = useState({ latitude: 0, longitude: 0 });
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
   const { data: { checkMe } } = useQuery(CHECK_ME, { suspend: true });
-  const { data: { getChatRoomList } } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
-  const { data: { findMyChatList } } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
+  const { data: { getChatRoomList }, refetch: allRoomsRef } = useQuery(GET_CHAT_ROOM_LIST, { suspend: true });
+  const { data: { findMyChatList }, loading, refetch: myRoomsRef } = useQuery(FIND_MY_CHAT_LIST, { suspend: true });
   const searchInput = useInput("");
   const [ chatRooms, setChatRooms ] = useState(getChatRoomList || []);
   const { data: newData } = useSubscription(NEW_ROOM);
@@ -41,9 +42,20 @@ function MainScreen(props) {
   }
 
   useEffect(() => {
-    preLoad();
-    handleNewRooms();
-  }, [newData, prevData]);
+    preLoad(); // 위치 정보 수락 여부 확인 및 세팅
+    handleNewRooms(); // Update subscribing new rooms
+
+    allRoomsRef();
+    myRoomsRef();
+    const focusSubscription = props.navigation.addListener( // Navigate, then refetch query
+      'didFocus',
+      () => {
+        allRoomsRef();
+        myRoomsRef();
+      }
+    );
+    return () => focusSubscription.remove(); // Remove event listener component will unmount
+  }, [newData, prevData, getChatRoomList]);
 
   async function preLoad() {
     try {
@@ -102,6 +114,7 @@ function MainScreen(props) {
 
   return (
     <View style={styles.container}>
+      <CustomIndicator isLoading={loading}/>
       
       <View style={styles.header}>
         <TouchableOpacity
@@ -168,9 +181,7 @@ function MainScreen(props) {
             now += "0"+newDate.getHours()+":"+newDate.getMinutes()+":00";
           else
             now += newDate.getHours()+":"+newDate.getMinutes()+":00";
-          const formattedTime = String(Math.floor(
-            (new Date(String(orderExpectedTime).substr(0,16))-new Date(now))/1000/60
-          ));
+          const formattedTime = String((new Date(String(orderExpectedTime).substr(0,16))-new Date(now))/1000/60);
           const onPress = () => {
             for(var i=0; i<memberList.length; i++)
               if(memberList[i]["id"] === checkMe.id) {

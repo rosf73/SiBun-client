@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Picker, Alert, TextInput } from 'react-native';
 import { withNavigation } from 'react-navigation';
-//import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 import { useInput } from '../hooks/useInput';
 
 function InputOrderInfoScreen(props) {
-  const [ location, setLocation ] = useState("주소지 선택");
-  const [ time, setTime ] = useState({ hour: 0, min: 0 });
-  var minList = [];
-  for(var i=0; i<60; i++) {
-    if(i < 10)
-      minList.push("0"+i);
-    else
-      minList.push(String(i));
-  }
+  const [ location, setLocation ] = useState("금오공과대학교 기숙사");
+  const [ time, setTime ] = useState({ hour: "00", min: "00" });
   const locationInput = useInput("");
 
   useEffect(() => {
@@ -22,45 +14,48 @@ function InputOrderInfoScreen(props) {
   }, []);
 
   const initTime = () => {
-    if(new Date().getMinutes() < 50 && new Date().getHours() >= 10)
-      setTime({
-        hour: new Date().getHours(),
-        min: new Date().getMinutes()+10
-      });
-    else if(new Date().getMinutes() < 50 && new Date().getHours() < 10)
-      setTime({
-        hour: "0"+new Date().getHours(),
-        min: new Date().getMinutes()+10
-      });
-    else if(new Date().getMinutes() >= 50 && new Date().getHours()+1 >= 10)
-      setTime({
-        hour: (new Date().getHours()+1)%24,
-        min: "0"+(new Date().getMinutes()+10)
-      });
-    else
-      setTime({
-        hour: "0"+((new Date().getHours()+1)%24),
-        min: "0"+(new Date().getMinutes()-50)
-      });
-  }
+    var h = new Date().getHours();
+    var m = new Date().getMinutes()+20-((new Date().getMinutes()+10)%10); // 20분을 더하고 10의 배수로 전환
+
+    if(m < 60) { // 분이 60분 미만
+      if(h < 10)
+        h = "0"+h;
+    }
+    else { // 시간 +1
+      if(h === 23)
+        h = "00";
+      else if(h+1 < 10)
+        h = "0"+(h+1);
+      else
+        h = h+1;
+      
+      if(m-60 < 10)
+        m = "0"+(m-60);
+      else
+        m = m-60;
+    }
+    setTime({ hour: h+"", min: m+"" });
+  };
+
   const handlePressBack = () => {
     props.navigation.goBack();
     return true;
   };
   const handlePressConfirm = () => {
-    if(location === "주소지 선택")
-      Alert.alert("주소지를 선택해주세요");
-    else if(locationInput.value === "")
+    if(locationInput.value === "")
       Alert.alert("추가 주소지를 입력해주세요");
-    else if((new Date().getHours() < time.hour && new Date().getMinutes() < time.min)
-         || (new Date().getHours() == time.hour && new Date().getMinutes()+10 > time.min)) {
+    else if((new Date().getHours() < time.hour*1 && new Date().getMinutes() < time.min*1)
+         || (new Date().getHours() == time.hour*1 && new Date().getMinutes()+10 > time.min*1)) {
       Alert.alert("현재 시간으로부터 10분 이상/1시간 이내의 시간으로 주문 예약할 수 있습니다");
       initTime();
     }
     else {
+      var now = new Date();
+      if(now.getHours() !== 0 && time.hour === "00") // 주문 시간이 다음 날 일 때
+        now = new Date(now.getDate() + 24*60*60*1000); // 다음 날의 날짜
       props.navigation.navigate("OrderNavigation", {
         storeName: props.navigation.state.params.store,
-        time: new Date().getFullYear()+"-"+(new Date().getMonth()+1)+"-"+new Date().getDate()+"T"+time.hour+":"+time.min,
+        time: now.getFullYear()+"-"+(now.getMonth()+1)+"-"+now.getDate()+"T"+time.hour+":"+time.min,
         location,
         addLocation: locationInput.value,
         boss: true
@@ -93,46 +88,62 @@ function InputOrderInfoScreen(props) {
       <View style={styles.client}>
         <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
           <Text style={{ fontSize: 18 }}>{location}</Text>
-          <Picker
-            selectedValue={location}
-            style={{ width: 50, height: 50 }}
-            onValueChange={handleChangeLocation}>
-            <Picker.Item label="금오공과대학교 기숙사" value="금오공과대학교 기숙사"/>
-            <Picker.Item label="금오공과대학교 테크노관" value="금오공과대학교 테크노관"/>
-            <Picker.Item label="금오공과대학교 디지털관" value="금오공과대학교 디지털관"/>
-            <Picker.Item label="금오공과대학교 글로벌관" value="금오공과대학교 글로벌관"/>
-            <Picker.Item label="금오공과대학교 학생회관" value="금오공과대학교 학생회관"/>
-          </Picker>
+          <View style={styles.picker}>
+            <Picker
+              selectedValue={location}
+              style={{ width: 30, height: 30 }}
+              onValueChange={handleChangeLocation}>
+              <Picker.Item label="금오공과대학교 기숙사" value="금오공과대학교 기숙사"/>
+              <Picker.Item label="금오공과대학교 테크노관" value="금오공과대학교 테크노관"/>
+              <Picker.Item label="금오공과대학교 디지털관" value="금오공과대학교 디지털관"/>
+              <Picker.Item label="금오공과대학교 글로벌관" value="금오공과대학교 글로벌관"/>
+              <Picker.Item label="금오공과대학교 학생회관" value="금오공과대학교 학생회관"/>
+            </Picker>
+          </View>
         </View>
         <View style={styles.input}>
           <TextInput
             style={{ color: '#666', fontSize: 16 }}
             {...locationInput}
-            placeholder="추가 주소지 입력"
+            placeholder="추가 주소지(예: 대나무숲, 오름 2동)"
             placeholderTextColor="#CCC"/>
         </View>
         <Text style={styles.description}>예상 주문 시간을 선택해 주세요</Text>
         <View style={styles.time}>
           <Text>{time.hour}</Text>
-          <Picker
-            selectedValue={time.hour}
-            style={{ width: 30, height: 30 }}
-            onValueChange={handleChangeHours}>
-            <Picker.Item label={String(new Date().getHours())} value={new Date().getHours()}/>
-            <Picker.Item label={String((new Date().getHours()+1)%24)} value={(new Date().getHours()+1)%24}/>
-          </Picker>
+          <View style={styles.picker}>
+            <Picker
+              selectedValue={time.hour}
+              style={{ width: 30, height: 30 }}
+              itemStyle={{ paddingHorizontal: 100 }}
+              onValueChange={handleChangeHours}>
+              <Picker.Item label={time.hour} value={time.hour}/>
+              {time.hour*1 < 9 ?
+                <Picker.Item label={"0"+(time.hour*1+1)} value={"0"+(time.hour*1+1)}/>
+                :
+                time.hour*1 === 23 ?
+                  <Picker.Item label={"00"} value={"00"}/>
+                  :
+                  <Picker.Item label={""+(time.hour*1+1)} value={""+(time.hour*1+1)}/>
+              }
+            </Picker>
+          </View>
           <Text style={{ fontSize: 18, marginRight: 20 }}>시</Text>
           <Text>{time.min}</Text>
-          <Picker
-            selectedValue={time.min}
-            style={{ width: 30, height: 30 }}
-            onValueChange={handleChangeMins}>
-            {
-              minList.map((item, index) => (
-                <Picker.item key={index} label={item} value={item}/>
-              ))
-            }
-          </Picker>
+          <View style={styles.picker}>
+            <Picker
+              selectedValue={time.min}
+              style={{ width: 30, height: 30 }}
+              itemStyle={{ paddingHorizontal: 15 }}
+              onValueChange={handleChangeMins}>
+              <Picker.item label={"00"} value={"00"}/>
+              <Picker.item label={"10"} value={"10"}/>
+              <Picker.item label={"20"} value={"20"}/>
+              <Picker.item label={"30"} value={"30"}/>
+              <Picker.item label={"40"} value={"40"}/>
+              <Picker.item label={"50"} value={"50"}/>
+            </Picker>
+          </View>
           <Text style={{ fontSize: 18 }}>분</Text>
         </View>
       </View>
@@ -187,6 +198,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#E2937B'
+  },
+  picker: {
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#CCC',
+    marginLeft: 8
   }
 });
 

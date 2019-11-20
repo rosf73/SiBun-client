@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useQuery } from "react-apollo-hooks";
 import { withNavigation } from 'react-navigation';
@@ -7,11 +7,21 @@ import { CHAT_INFO } from "../queries/ChatQuery";
 import withSuspense from "../withSuspense";
 
 function OpenChatInfoScreen(props) {
-  const { data: { getChatRoom } } = useQuery(CHAT_INFO, {
+  const { data: { getChatRoom }, refetch } = useQuery(CHAT_INFO, {
     suspend: true,
     variables: {
       roomId: props.navigation.state.params.roomId
     }
+  });
+
+  useEffect(() => {
+    const focusSubscription = props.navigation.addListener(
+      'didFocus',
+      () => {
+        refetch({ variables: { roomId: props.navigation.state.params.roomId } });
+      }
+    );
+    return () => focusSubscription.remove();
   })
 
   const handlePressBack = () => {
